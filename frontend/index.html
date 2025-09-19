@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue's Book - Chelsea FC Squad Reference</title>
+    <meta name="description" content="The definitive digital reference for Chelsea FC squad information. Find player profiles, statistics, and fun facts.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/tailwind.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔵</text></svg>">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🔵</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Blue's Book</h1>
+                        <p class="text-blue-200 text-sm">Chelsea FC Squad Reference</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <span class="text-blue-200">Keep The Blue Flag Flying High!</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Search Section -->
+        <section class="mb-12">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">
+                    Find Your Chelsea Player
+                </h2>
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="playerSearch" 
+                        placeholder="Search for a player..." 
+                        class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                    >
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <!-- Search Suggestions -->
+                    <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden z-10">
+                        <!-- Suggestions will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Random Player of the Day -->
+        <section class="mb-12">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">🎲 Random Player of the Day</h3>
+                <div id="randomPlayer" class="flex items-center space-x-4">
+                    <div class="animate-pulse bg-blue-400 rounded-lg w-16 h-16"></div>
+                    <div>
+                        <div class="animate-pulse bg-blue-400 rounded h-4 w-32 mb-2"></div>
+                        <div class="animate-pulse bg-blue-400 rounded h-3 w-24"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Squad Overview -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Current Squad</h3>
+                <div class="flex space-x-2">
+                    <select id="positionFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">All Positions</option>
+                        <option value="GK">Goalkeepers</option>
+                        <option value="DEF">Defenders</option>
+                        <option value="MID">Midfielders</option>
+                        <option value="FWD">Forwards</option>
+                    </select>
+                    <select id="sortBy" class="px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="jersey_number">Jersey Number</option>
+                        <option value="name">Name</option>
+                        <option value="age">Age</option>
+                        <option value="position">Position</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Squad Grid -->
+            <div id="squadGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Player cards will be populated here -->
+                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
+                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
+                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
+                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
+            </div>
+        </section>
+
+        <!-- Player Profile Modal -->
+        <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="modalPlayerName" class="text-2xl font-bold text-gray-800"></h3>
+                            <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="modalContent">
+                            <!-- Player details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-4">
+                <div class="text-2xl font-bold mb-2">Blue's Book</div>
+                <p class="text-gray-400">The definitive digital reference for Chelsea FC squad information</p>
+            </div>
+            <div class="text-sm text-gray-500">
+                <p>Made with 💙 for Chelsea FC fans worldwide</p>
+                <p class="mt-2">Keep The Blue Flag Flying High! KTBFFH</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg p-8 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/player.js"></script>
+</body>
+</html>
+
