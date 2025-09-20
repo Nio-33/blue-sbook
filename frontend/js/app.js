@@ -16,6 +16,10 @@ class BluesBookApp {
             sortBy: 'jersey_number'
         };
         
+        // Chat state
+        this.chatHistory = [];
+        this.isTyping = false;
+        
         this.init();
     }
     
@@ -108,6 +112,9 @@ class BluesBookApp {
             item.addEventListener('click', this.handleNavigation.bind(this));
         });
         
+        // Chat functionality
+        this.setupChatEventListeners();
+        
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
     }
@@ -129,7 +136,7 @@ class BluesBookApp {
         });
         
         // Hide other sections by default
-        const otherSections = ['managerSection', 'statisticsSection', 'aboutSection'];
+        const otherSections = ['managerSection', 'statisticsSection', 'chatSection', 'aboutSection'];
         otherSections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
@@ -701,7 +708,7 @@ class BluesBookApp {
         event.target.classList.add('active');
         
         // Hide all main sections
-        const sections = ['playersSection', 'managerSection', 'statisticsSection', 'aboutSection'];
+        const sections = ['playersSection', 'managerSection', 'statisticsSection', 'chatSection', 'aboutSection'];
         sections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
@@ -736,6 +743,10 @@ class BluesBookApp {
             case 'statistics':
                 this.showSection('statisticsSection');
                 this.loadStatisticsData();
+                break;
+            case 'chat':
+                this.showSection('chatSection');
+                this.loadChatData();
                 break;
             case 'about':
                 this.showSection('aboutSection');
@@ -1242,6 +1253,322 @@ class BluesBookApp {
             `;
             section.appendChild(errorDiv);
         }
+    }
+    
+    // Chat functionality methods
+    setupChatEventListeners() {
+        const chatSendButton = document.getElementById('chatSendButton');
+        const chatInput = document.getElementById('chatInput');
+        
+        if (chatSendButton) {
+            chatSendButton.addEventListener('click', this.sendMessage.bind(this));
+        }
+        
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+            
+            chatInput.addEventListener('input', this.handleChatInputChange.bind(this));
+            chatInput.addEventListener('input', this.updateCharacterCounter.bind(this));
+        }
+        
+        // Suggested questions
+        const suggestedButtons = document.querySelectorAll('.suggested-question');
+        suggestedButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const question = e.target.textContent.trim();
+                this.sendSuggestedQuestion(question);
+            });
+        });
+    }
+    
+    async loadChatData() {
+        try {
+            // Load suggested questions
+            await this.loadSuggestedQuestions();
+            
+            // Check chat health
+            await this.checkChatHealth();
+            
+            // Initialize chat if empty
+            if (this.chatHistory.length === 0) {
+                this.initializeChat();
+            }
+        } catch (error) {
+            console.error('Error loading chat data:', error);
+            this.showChatError('Failed to initialize chat');
+        }
+    }
+    
+    async loadSuggestedQuestions() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/chat/suggestions`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displaySuggestedQuestions(data.data.slice(0, 4)); // Show first 4
+            }
+        } catch (error) {
+            console.error('Error loading suggested questions:', error);
+        }
+    }
+    
+    displaySuggestedQuestions(questions) {
+        const container = document.getElementById('chatSuggestedQuestions');
+        if (!container) return;
+        
+        container.innerHTML = questions.map(question => `
+            <button class="suggested-question bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm hover:bg-blue-100 transition">
+                ${question}
+            </button>
+        `).join('');
+        
+        // Re-attach event listeners
+        const suggestedButtons = container.querySelectorAll('.suggested-question');
+        suggestedButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const question = e.target.textContent.trim();
+                this.sendSuggestedQuestion(question);
+            });
+        });
+    }
+    
+    async checkChatHealth() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/chat/health`);
+            const data = await response.json();
+            
+            const healthIndicator = document.getElementById('chatHealthIndicator');
+            if (healthIndicator) {
+                if (data.healthy) {
+                    healthIndicator.className = 'w-3 h-3 bg-green-500 rounded-full';
+                    healthIndicator.title = 'Chat service is online';
+                } else {
+                    healthIndicator.className = 'w-3 h-3 bg-red-500 rounded-full';
+                    healthIndicator.title = 'Chat service is offline';
+                }
+            }
+        } catch (error) {
+            console.error('Error checking chat health:', error);
+        }
+    }
+    
+    initializeChat() {
+        const welcomeMessage = {
+            type: 'ai',
+            message: "Hello! I'm your Chelsea FC history assistant. Ask me anything about the club's history, players, managers, trophies, and memorable moments. What would you like to know?",
+            timestamp: Date.now()
+        };
+        
+        this.chatHistory.push(welcomeMessage);
+        this.displayChatMessage(welcomeMessage);
+    }
+    
+    async sendMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const message = chatInput.value.trim();
+        
+        if (!message) return;
+        
+        // Clear input and disable send button
+        chatInput.value = '';
+        this.updateSendButton(false);
+        
+        // Add user message to chat
+        const userMessage = {
+            type: 'user',
+            message: message,
+            timestamp: Date.now()
+        };
+        
+        this.chatHistory.push(userMessage);
+        this.displayChatMessage(userMessage);
+        
+        // Show typing indicator
+        this.showTypingIndicator();
+        
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/chat/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    history: this.chatHistory.slice(-10) // Send last 10 messages for context
+                })
+            });
+            
+            const data = await response.json();
+            
+            this.hideTypingIndicator();
+            
+            if (data.success) {
+                const aiMessage = {
+                    type: 'ai',
+                    message: data.message,
+                    timestamp: Date.now(),
+                    queryTime: data.query_time
+                };
+                
+                this.chatHistory.push(aiMessage);
+                this.displayChatMessage(aiMessage);
+            } else {
+                this.showChatError(data.error || 'Failed to get response');
+            }
+        } catch (error) {
+            this.hideTypingIndicator();
+            console.error('Error sending message:', error);
+            this.showChatError('Connection error. Please try again.');
+        }
+    }
+    
+    async sendSuggestedQuestion(question) {
+        const chatInput = document.getElementById('chatInput');
+        chatInput.value = question;
+        await this.sendMessage();
+    }
+    
+    displayChatMessage(message) {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) return;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.type === 'user' ? 'user-message' : 'ai-message'} mb-4 fade-in`;
+        
+        const time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        if (message.type === 'user') {
+            messageDiv.innerHTML = `
+                <div class="flex justify-end">
+                    <div class="bg-blue-500 text-white rounded-lg px-4 py-2 max-w-md">
+                        <p class="text-sm">${this.escapeHtml(message.message)}</p>
+                        <p class="text-xs opacity-75 mt-1">${time}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-blue-600 text-sm"></i>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 max-w-md">
+                        <p class="text-sm text-gray-800">${this.formatAIMessage(message.message)}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <p class="text-xs text-gray-500">${time}</p>
+                            ${message.queryTime ? `<p class="text-xs text-gray-400">${message.queryTime}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+    
+    showTypingIndicator() {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) return;
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'message ai-message mb-4';
+        typingDiv.innerHTML = `
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-blue-600 text-sm"></i>
+                </div>
+                <div class="bg-gray-100 rounded-lg px-4 py-2">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        messagesContainer.appendChild(typingDiv);
+        this.isTyping = true;
+        this.scrollToBottom();
+    }
+    
+    hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+        this.isTyping = false;
+    }
+    
+    handleChatInputChange(event) {
+        const message = event.target.value.trim();
+        this.updateSendButton(message.length > 0 && !this.isTyping);
+    }
+    
+    updateSendButton(enabled) {
+        const sendButton = document.getElementById('chatSendButton');
+        if (sendButton) {
+            sendButton.disabled = !enabled;
+            sendButton.className = enabled 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors'
+                : 'bg-gray-400 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed disabled:bg-gray-400 disabled:cursor-not-allowed';
+        }
+    }
+    
+    updateCharacterCounter(event) {
+        const charCounter = document.getElementById('charCounter');
+        if (charCounter) {
+            const currentLength = event.target.value.length;
+            const maxLength = 500;
+            charCounter.textContent = `${currentLength}/${maxLength}`;
+            
+            // Change color as user approaches limit
+            if (currentLength > 450) {
+                charCounter.className = 'absolute right-3 top-3 text-xs text-red-500';
+            } else if (currentLength > 400) {
+                charCounter.className = 'absolute right-3 top-3 text-xs text-orange-500';
+            } else {
+                charCounter.className = 'absolute right-3 top-3 text-xs text-gray-400';
+            }
+        }
+    }
+    
+    scrollToBottom() {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    formatAIMessage(message) {
+        // Basic formatting for AI messages
+        return this.escapeHtml(message)
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
+    
+    showChatError(message) {
+        const errorMessage = {
+            type: 'ai',
+            message: `❌ ${message}`,
+            timestamp: Date.now()
+        };
+        
+        this.displayChatMessage(errorMessage);
     }
 }
 

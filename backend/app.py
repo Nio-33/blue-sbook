@@ -9,13 +9,14 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from project root
+load_dotenv(dotenv_path=Path(__file__).parent.parent / '.env')
 
 # Import routes
 from routes.player_routes import player_bp
 from routes.manager_routes import manager_bp
 from routes.search_routes import search_bp
+from routes.chat_routes import chat_bp
 
 def create_app():
     """Create and configure the Flask application"""
@@ -37,6 +38,7 @@ def create_app():
     app.register_blueprint(player_bp, url_prefix='/api/v1/players')
     app.register_blueprint(manager_bp, url_prefix='/api/v1/managers')
     app.register_blueprint(search_bp, url_prefix='/api/v1/search')
+    app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
     
     # Health check endpoint
     @app.route('/health')
@@ -57,6 +59,7 @@ def create_app():
                 'players': '/api/v1/players',
                 'managers': '/api/v1/managers',
                 'search': '/api/v1/search',
+                'chat': '/api/v1/chat',
                 'health': '/health'
             }
         })
