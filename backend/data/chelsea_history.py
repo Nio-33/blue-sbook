@@ -37,11 +37,11 @@ CHELSEA_TROPHIES = {
         ],
         "fifa_club_world_cup": [
             {
-                "year": 2022,
-                "final": "Chelsea 2-1 Palmeiras (aet)",
-                "venue": "Mohammed bin Zayed Stadium, Abu Dhabi",
-                "manager": "Thomas Tuchel",
-                "scorers": ["Thiago Silva", "Kai Havertz"],
+                "year": 2025,
+                "final": "Chelsea vs PSG",
+                "venue": "TBD",
+                "manager": "TBD",
+                "scorers": ["TBD"],
                 "significance": "Chelsea's first FIFA Club World Cup title"
             }
         ],
@@ -80,14 +80,16 @@ CHELSEA_TROPHIES = {
     "recent_achievements": {
         "last_major_trophy": {
             "trophy": "FIFA Club World Cup",
-            "year": 2022,
-            "date": "February 12, 2022",
-            "significance": "Most recent major trophy - corrects AI knowledge cutoff"
+            "year": 2025,
+            "date": "2025",
+            "opponent": "PSG",
+            "significance": "Most recent major trophy - Chelsea's first FIFA Club World Cup victory"
         },
         "last_trophy_overall": {
             "trophy": "FIFA Club World Cup",
-            "year": 2022,
-            "manager": "Thomas Tuchel"
+            "year": 2025,
+            "opponent": "PSG",
+            "manager": "TBD"
         }
     }
 }
