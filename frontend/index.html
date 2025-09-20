@@ -17,10 +17,19 @@
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
-            --text-primary: #1f2937;
+            --text-primary: #034694;
             --text-secondary: #6b7280;
             --border-color: #e5e7eb;
             --shadow-color: rgba(0, 0, 0, 0.1);
+            
+            /* Form Elements - Light Theme */
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --input-text: #1f2937;
+            --input-placeholder: #9ca3af;
+            --select-bg: #ffffff;
+            --select-text: #1f2937;
+            --select-border: #d1d5db;
         }
         
         /* Dark Theme */
@@ -29,9 +38,18 @@
             --bg-secondary: #1e293b;
             --bg-card: #334155;
             --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
+            --text-secondary: #e2e8f0;
             --border-color: #475569;
             --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            /* Form Elements - Dark Theme */
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --input-text: #f1f5f9;
+            --input-placeholder: #94a3b8;
+            --select-bg: #1e293b;
+            --select-text: #f1f5f9;
+            --select-border: #475569;
         }
         
         body {
@@ -41,8 +59,56 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        .header-gradient {
-            background: linear-gradient(135deg, var(--chelsea-blue) 0%, var(--chelsea-light-blue) 100%);
+        .header-clear {
+            background: transparent;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Header text colors - Chelsea blue for light theme */
+        .header-nav-text {
+            color: var(--chelsea-blue);
+            transition: color 0.3s ease;
+        }
+        
+        .header-nav-text:hover {
+            color: var(--chelsea-light-blue);
+        }
+        
+        /* Header title styling - Chelsea blue for light theme */
+        .header-title {
+            color: var(--chelsea-blue);
+            transition: color 0.3s ease;
+        }
+        
+        /* Dark theme header text - use light colors */
+        [data-theme="dark"] .header-nav-text {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .header-nav-text:hover {
+            color: var(--chelsea-light-blue);
+        }
+        
+        [data-theme="dark"] .header-title {
+            color: var(--text-primary);
+        }
+        
+        /* Mobile menu button - follows header text pattern */
+        .mobile-menu-btn {
+            color: var(--chelsea-blue);
+            transition: color 0.3s ease;
+        }
+        
+        .mobile-menu-btn:hover {
+            color: var(--chelsea-light-blue);
+        }
+        
+        [data-theme="dark"] .mobile-menu-btn {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .mobile-menu-btn:hover {
+            color: var(--chelsea-light-blue);
         }
         
         .btn-primary {
@@ -127,7 +193,7 @@
         }
         
         .nav-item.active {
-            color: var(--chelsea-gold);
+            color: var(--chelsea-gold) !important;
             font-weight: 600;
         }
         
@@ -212,6 +278,74 @@
             border-color: var(--border-color);
         }
         
+        /* Theme-aware form elements */
+        .theme-input {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--input-text) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-input::placeholder {
+            color: var(--input-placeholder) !important;
+        }
+        
+        .theme-input:focus {
+            border-color: var(--chelsea-blue) !important;
+            box-shadow: 0 0 0 3px rgba(3, 70, 148, 0.1) !important;
+            outline: none !important;
+        }
+        
+        .theme-select {
+            background-color: var(--select-bg) !important;
+            border-color: var(--select-border) !important;
+            color: var(--select-text) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-select option {
+            background-color: var(--select-bg);
+            color: var(--select-text);
+        }
+        
+        .theme-button {
+            transition: all 0.3s ease;
+        }
+        
+        /* Fix specific form styling issues */
+        [data-theme="dark"] .theme-input {
+            border: 1px solid var(--input-border);
+        }
+        
+        [data-theme="dark"] .theme-select {
+            border: 1px solid var(--select-border);
+        }
+        
+        /* Additional search suggestion styling */
+        .search-results .suggestion-item {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .search-results .suggestion-item:hover {
+            background-color: var(--chelsea-blue);
+            color: white;
+        }
+        
+        /* Enhanced dark theme form visibility */
+        [data-theme="dark"] input[type="text"],
+        [data-theme="dark"] input[type="search"],
+        [data-theme="dark"] select {
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border-color: var(--input-border);
+        }
+        
+        [data-theme="dark"] input::placeholder {
+            color: var(--input-placeholder);
+        }
+        
         /* Theme toggle button specific styling */
         #themeToggle {
             position: relative;
@@ -232,30 +366,30 @@
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header/Navigation -->
-    <header class="header-gradient text-white shadow-md">
+    <header class="header-clear shadow-md">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1">
                         <img src="images/chelsea-logo-official.svg" alt="Chelsea FC Official Logo" class="w-full h-full object-contain">
                     </div>
-                    <h1 class="text-2xl font-bold">Blue's Book</h1>
+                    <h1 class="text-2xl font-bold header-title">Blue's Book</h1>
                 </div>
                 
                 <nav class="hidden md:flex space-x-8">
-                    <a href="#" class="nav-item font-medium" data-section="players">Players</a>
-                    <a href="#" class="nav-item font-medium" data-section="manager">Manager</a>
-                    <a href="#" class="nav-item font-medium" data-section="statistics">Statistics</a>
-                    <a href="#" class="nav-item font-medium" data-section="chat">Chat</a>
-                    <a href="#" class="nav-item font-medium" data-section="about">About</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="players">Players</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="manager">Manager</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="statistics">Statistics</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="chat">Chat</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="about">About</a>
                 </nav>
                 
                 <div class="flex items-center space-x-4">
                     <!-- Theme Toggle Button -->
-                    <button id="themeToggle" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-lg transition-all duration-300" title="Toggle Theme">
+                    <button id="themeToggle" class="theme-card theme-text-primary p-2 rounded-lg transition-all duration-300 hover:opacity-80" title="Toggle Theme">
                         <i class="fas fa-moon text-lg" id="themeIcon"></i>
                     </button>
-                    <button class="md:hidden">
+                    <button class="md:hidden mobile-menu-btn">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
@@ -278,7 +412,7 @@
             <div class="max-w-2xl mx-auto search-container">
                 <div class="relative">
                     <input type="text" id="playerSearch" placeholder="Search players by name..." 
-                           class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                           class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm theme-input">
                     <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">
                         <i class="fas fa-search"></i>
                     </button>
@@ -303,7 +437,7 @@
             <div class="flex flex-wrap items-center justify-center gap-4">
                 <div class="filter-group">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                    <select id="positionFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="positionFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-select">
                         <option value="">All Positions</option>
                         <option value="GK">Goalkeeper</option>
                         <option value="DEF">Defender</option>
@@ -314,7 +448,7 @@
                 
                 <div class="filter-group">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
-                    <select id="sortBy" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="sortBy" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-select">
                         <option value="jersey_number">Jersey Number</option>
                         <option value="name">Name</option>
                         <option value="age">Age</option>
@@ -324,7 +458,7 @@
                 
                 <div class="filter-group">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-                    <select id="nationalityFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="nationalityFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-select">
                         <option value="">All Nationalities</option>
                         <option value="England">England</option>
                         <option value="Argentina">Argentina</option>
@@ -336,7 +470,7 @@
                     </select>
                 </div>
                 
-                <button id="clearFilters" class="mt-6 bg-gray-200 text-gray-800 theme-text-primary px-4 py-2 rounded-md font-medium hover:bg-gray-300 transition">
+                <button id="clearFilters" class="mt-6 theme-card theme-text-primary px-4 py-2 rounded-md font-medium hover:opacity-80 transition theme-border border">
                     <i class="fas fa-times mr-2"></i>Clear Filters
                 </button>
             </div>
@@ -405,7 +539,7 @@
             
             <!-- Load More Button -->
             <div class="mt-12 text-center">
-                <button id="loadMoreBtn" class="bg-gray-200 text-gray-800 theme-text-primary px-6 py-3 rounded-md font-semibold hover:bg-gray-300 transition">
+                <button id="loadMoreBtn" class="theme-card theme-text-primary px-6 py-3 rounded-md font-semibold hover:opacity-80 transition theme-border border">
                     Load More Players
                 </button>
             </div>
@@ -420,7 +554,7 @@
                 <div class="max-w-2xl mx-auto search-container">
                     <div class="relative">
                         <input type="text" id="managerSearch" placeholder="Search past Chelsea managers..." 
-                               class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                               class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm theme-input">
                         <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">
                             <i class="fas fa-search"></i>
                         </button>
@@ -707,8 +841,8 @@
                 <!-- Chat Container -->
                 <div class="theme-card rounded-xl shadow-lg overflow-hidden">
                     <!-- Chat Messages Area -->
-                    <div class="h-96 overflow-y-auto p-6 bg-gray-50" id="chatMessages">
-                        <div class="flex items-center justify-center h-full text-gray-500">
+                    <div class="h-96 overflow-y-auto p-6 theme-card" id="chatMessages">
+                        <div class="flex items-center justify-center h-full theme-text-secondary">
                             <div class="text-center">
                                 <i class="fas fa-comments text-4xl mb-4"></i>
                                 <p>Start a conversation about Chelsea FC history!</p>
@@ -717,17 +851,17 @@
                     </div>
                     
                     <!-- Chat Input Area -->
-                    <div class="border-t border-gray-200 p-4 bg-white">
+                    <div class="border-t theme-border p-4 theme-card">
                         <div class="flex space-x-4">
                             <div class="flex-1 relative">
                                 <input 
                                     type="text" 
                                     id="chatInput" 
                                     placeholder="Ask about Chelsea FC history, players, trophies..."
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-input"
                                     maxlength="500"
                                 >
-                                <div class="absolute right-3 top-3 text-xs text-gray-400" id="charCounter">0/500</div>
+                                <div class="absolute right-3 top-3 text-xs theme-text-secondary" id="charCounter">0/500</div>
                             </div>
                             <button 
                                 id="chatSendButton" 
@@ -739,7 +873,7 @@
                         </div>
                         
                         <!-- Chat Status -->
-                        <div class="mt-2 text-xs text-gray-500 flex items-center justify-between">
+                        <div class="mt-2 text-xs theme-text-secondary flex items-center justify-between">
                             <span id="chatStatus">Ready to chat about Chelsea FC</span>
                             <span id="typingIndicator" class="hidden">
                                 <i class="fas fa-spinner fa-spin mr-1"></i>AI is thinking...
