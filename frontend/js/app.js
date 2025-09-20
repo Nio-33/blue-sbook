@@ -20,10 +20,14 @@ class BluesBookApp {
         this.chatHistory = [];
         this.isTyping = false;
         
+        // Theme state
+        this.currentTheme = 'light';
+        
         this.init();
     }
     
     init() {
+        this.initializeTheme();
         this.setupEventListeners();
         this.setDefaultNavigation();
         this.loadInitialData();
@@ -114,6 +118,9 @@ class BluesBookApp {
         
         // Chat functionality
         this.setupChatEventListeners();
+        
+        // Theme functionality
+        this.setupThemeEventListener();
         
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
@@ -1569,6 +1576,87 @@ class BluesBookApp {
         };
         
         this.displayChatMessage(errorMessage);
+    }
+    
+    // Theme management methods
+    initializeTheme() {
+        // Load saved theme from localStorage or default to light
+        const savedTheme = localStorage.getItem('bluesbook-theme') || 'light';
+        this.currentTheme = savedTheme;
+        this.applyTheme(savedTheme);
+        this.updateThemeIcon();
+        console.log('Theme initialized:', savedTheme);
+    }
+    
+    setupThemeEventListener() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', this.toggleTheme.bind(this));
+        }
+    }
+    
+    toggleTheme() {
+        const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        this.currentTheme = newTheme;
+        this.applyTheme(newTheme);
+        this.updateThemeIcon();
+        
+        // Save preference to localStorage
+        localStorage.setItem('bluesbook-theme', newTheme);
+        
+        // Add visual feedback
+        this.showThemeChangeNotification(newTheme);
+    }
+    
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Update any theme-specific classes
+        const body = document.body;
+        if (theme === 'dark') {
+            body.classList.add('dark-theme');
+        } else {
+            body.classList.remove('dark-theme');
+        }
+    }
+    
+    updateThemeIcon() {
+        const themeIcon = document.getElementById('themeIcon');
+        if (themeIcon) {
+            if (this.currentTheme === 'light') {
+                themeIcon.className = 'fas fa-moon text-lg';
+                themeIcon.parentElement.title = 'Switch to Dark Theme';
+            } else {
+                themeIcon.className = 'fas fa-sun text-lg';
+                themeIcon.parentElement.title = 'Switch to Light Theme';
+            }
+        }
+    }
+    
+    showThemeChangeNotification(theme) {
+        // Create a subtle notification
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-20 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full opacity-0';
+        notification.textContent = `Switched to ${theme === 'light' ? 'Light' : 'Dark'} Theme`;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+            notification.style.opacity = '1';
+        }, 100);
+        
+        // Remove after 2 seconds
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.parentElement.removeChild(notification);
+                }
+            }, 300);
+        }, 2000);
     }
 }
 
