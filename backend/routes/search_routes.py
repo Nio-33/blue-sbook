@@ -4,8 +4,12 @@ Handles global search functionality
 """
 
 from flask import Blueprint, jsonify, request
-from services.firebase_service import firebase_service
-from utils.formatters import format_search_result
+import sys
+import os
+
+# Add data directory to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
+from chelsea_players import search_players, get_current_manager
 import time
 
 search_bp = Blueprint('search', __name__)
@@ -29,20 +33,32 @@ def global_search():
         
         # Search players
         if category in ['all', 'players']:
-            players = firebase_service.search_players(query, limit)
+            players = search_players(query)[:limit]
             for player in players:
                 results.append({
                     'type': 'player',
-                    'data': format_search_result(player, 'player')
+                    'data': {
+                        'id': player.get('player_id'),
+                        'name': player.get('name'),
+                        'position': player.get('position'),
+                        'jersey_number': player.get('jersey_number'),
+                        'image_url': player.get('image_url')
+                    }
                 })
         
         # Search managers
         if category in ['all', 'managers']:
-            manager = firebase_service.get_current_manager()
+            manager = get_current_manager()
             if manager and query.lower() in manager.get('name', '').lower():
                 results.append({
                     'type': 'manager',
-                    'data': format_search_result(manager, 'manager')
+                    'data': {
+                        'id': manager.get('manager_id'),
+                        'name': manager.get('name'),
+                        'age': manager.get('age'),
+                        'nationality': manager.get('nationality'),
+                        'image_url': manager.get('image_url')
+                    }
                 })
         
         query_time = (time.time() - start_time) * 1000
@@ -88,7 +104,7 @@ def get_search_suggestions():
         start_time = time.time()
         
         # Get player suggestions
-        players = firebase_service.search_players(query, limit)
+        players = search_players(query)[:limit]
         suggestions = []
         
         for player in players:

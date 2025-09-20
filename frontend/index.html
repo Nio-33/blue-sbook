@@ -4,154 +4,742 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue's Book - Chelsea FC Squad Reference</title>
-    <meta name="description" content="The definitive digital reference for Chelsea FC squad information. Find player profiles, statistics, and fun facts.">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/tailwind.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔵</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --chelsea-blue: #034694;
+            --chelsea-light-blue: #6CA0DC;
+            --chelsea-white: #FFFFFF;
+            --chelsea-gold: #DBA111;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, var(--chelsea-blue) 0%, var(--chelsea-light-blue) 100%);
+        }
+        
+        .btn-primary {
+            background-color: var(--chelsea-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #023a7d;
+        }
+        
+        .player-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .position-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .position-gk {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        .position-df {
+            background-color: #10B981;
+            color: white;
+        }
+        
+        .position-mf {
+            background-color: #F59E0B;
+            color: white;
+        }
+        
+        .position-fw {
+            background-color: #EF4444;
+            color: white;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--chelsea-gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item:hover::after,
+        .nav-item.active::after {
+            width: 100%;
+        }
+        
+        .nav-item.active {
+            color: var(--chelsea-gold);
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--chelsea-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-blue-900 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="text-3xl">🔵</div>
-                    <div>
-                        <h1 class="text-2xl font-bold">Blue's Book</h1>
-                        <p class="text-blue-200 text-sm">Chelsea FC Squad Reference</p>
+<body class="min-h-screen flex flex-col">
+    <!-- Header/Navigation -->
+    <header class="header-gradient text-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                        <span class="text-blue-800 font-bold text-xl">CFC</span>
                     </div>
+                    <h1 class="text-2xl font-bold">Blue's Book</h1>
                 </div>
-                <div class="hidden md:flex items-center space-x-4">
-                    <span class="text-blue-200">Keep The Blue Flag Flying High!</span>
+                
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-item font-medium" data-section="players">Players</a>
+                    <a href="#" class="nav-item font-medium" data-section="manager">Manager</a>
+                    <a href="#" class="nav-item font-medium" data-section="statistics">Statistics</a>
+                    <a href="#" class="nav-item font-medium" data-section="about">About</a>
+                </nav>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="randomPlayerBtn" class="bg-white text-blue-800 px-4 py-2 rounded-md font-semibold hover:bg-gray-100 transition">
+                        <i class="fas fa-random mr-2"></i>Random Player
+                    </button>
+                    <button class="md:hidden">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <!-- Search Section -->
-        <section class="mb-12">
-            <div class="max-w-2xl mx-auto">
-                <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">
-                    Find Your Chelsea Player
-                </h2>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="mb-12 text-center">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Chelsea FC Squad Reference</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                The definitive digital reference for comprehensive, real-time information about current Chelsea FC players and management.
+            </p>
+        </section>
+
+        <!-- Search Section (Only for Players) -->
+        <section id="searchSection" class="mb-12">
+            <div class="max-w-2xl mx-auto search-container">
                 <div class="relative">
-                    <input 
-                        type="text" 
-                        id="playerSearch" 
-                        placeholder="Search for a player..." 
-                        class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
-                    >
-                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <!-- Search Suggestions -->
-                    <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden z-10">
-                        <!-- Suggestions will be populated here -->
-                    </div>
+                    <input type="text" id="playerSearch" placeholder="Search players by name..." 
+                           class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                    <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <!-- Search Results Dropdown -->
+                <div id="searchSuggestions" class="search-results hidden mt-1 bg-white rounded-md shadow-lg border border-gray-200">
+                    <!-- Search suggestions will be populated here -->
                 </div>
             </div>
         </section>
 
-        <!-- Random Player of the Day -->
-        <section class="mb-12">
-            <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-8 text-white">
-                <h3 class="text-2xl font-bold mb-4">🎲 Random Player of the Day</h3>
-                <div id="randomPlayer" class="flex items-center space-x-4">
-                    <div class="animate-pulse bg-blue-400 rounded-lg w-16 h-16"></div>
-                    <div>
-                        <div class="animate-pulse bg-blue-400 rounded h-4 w-32 mb-2"></div>
-                        <div class="animate-pulse bg-blue-400 rounded h-3 w-24"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Squad Overview -->
-        <section class="mb-12">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Current Squad</h3>
-                <div class="flex space-x-2">
-                    <select id="positionFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+        <!-- Filters Section (Only for Players) -->
+        <section id="filtersSection" class="mb-8">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <div class="filter-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                    <select id="positionFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">All Positions</option>
-                        <option value="GK">Goalkeepers</option>
-                        <option value="DEF">Defenders</option>
-                        <option value="MID">Midfielders</option>
-                        <option value="FWD">Forwards</option>
+                        <option value="GK">Goalkeeper</option>
+                        <option value="DEF">Defender</option>
+                        <option value="MID">Midfielder</option>
+                        <option value="FWD">Forward</option>
                     </select>
-                    <select id="sortBy" class="px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                    <select id="sortBy" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="jersey_number">Jersey Number</option>
                         <option value="name">Name</option>
                         <option value="age">Age</option>
-                        <option value="position">Position</option>
+                        <option value="signing_fee">Signing Fee</option>
                     </select>
                 </div>
-            </div>
-            
-            <!-- Squad Grid -->
-            <div id="squadGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Player cards will be populated here -->
-                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
-                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
-                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
-                <div class="animate-pulse bg-gray-200 rounded-lg h-48"></div>
+                
+                <div class="filter-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                    <select id="nationalityFilter" class="rounded-md border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Nationalities</option>
+                        <option value="England">England</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="France">France</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Senegal">Senegal</option>
+                        <option value="Ecuador">Ecuador</option>
+                    </select>
+                </div>
+                
+                <button id="clearFilters" class="mt-6 bg-gray-200 text-gray-800 px-4 py-2 rounded-md font-medium hover:bg-gray-300 transition">
+                    <i class="fas fa-times mr-2"></i>Clear Filters
+                </button>
             </div>
         </section>
 
-        <!-- Player Profile Modal -->
-        <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 id="modalPlayerName" class="text-2xl font-bold text-gray-800"></h3>
-                            <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
+        <!-- Featured Player of the Day (Only for Players) -->
+        <section id="featuredSection" class="mb-12">
+            <div class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl shadow-lg overflow-hidden">
+                <div class="md:flex">
+                    <div class="md:flex-shrink-0 md:w-1/3">
+                        <div class="h-64 md:h-full bg-gray-300 relative">
+                            <img id="featuredPlayerImage" class="w-full h-full object-cover" style="display: none;" alt="Featured Player">
+                            <div id="featuredPlayerPlaceholder" class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-user text-6xl text-gray-400"></i>
+                            </div>
                         </div>
-                        <div id="modalContent">
-                            <!-- Player details will be populated here -->
+                    </div>
+                    <div class="p-8 md:w-2/3 text-white">
+                        <div class="uppercase tracking-wide text-sm text-blue-200 font-semibold">Player of the Day</div>
+                        <h2 id="featuredPlayerName" class="text-3xl font-bold mt-2">Loading...</h2>
+                        <div class="flex items-center mt-1">
+                            <span id="featuredPlayerPosition" class="position-badge position-fw mr-2">Loading</span>
+                            <span id="featuredPlayerDetails">Loading...</span>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-blue-200 text-sm">Jersey Number</p>
+                                <p id="featuredPlayerJersey" class="text-xl font-semibold">#--</p>
+                            </div>
+                            <div>
+                                <p class="text-blue-200 text-sm">Signing Fee</p>
+                                <p id="featuredPlayerFee" class="text-xl font-semibold">--</p>
+                            </div>
+                            <div>
+                                <p class="text-blue-200 text-sm">Years at Club</p>
+                                <p id="featuredPlayerYears" class="text-xl font-semibold">--</p>
+                            </div>
+                            <div>
+                                <p class="text-blue-200 text-sm">Weekly Salary</p>
+                                <p id="featuredPlayerSalary" class="text-xl font-semibold">--</p>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <p class="text-blue-200 text-sm">Fun Fact</p>
+                            <p id="featuredPlayerFact" class="italic">Loading fun fact...</p>
+                        </div>
+                        <button id="featuredPlayerProfile" class="mt-6 bg-white text-blue-800 px-6 py-2 rounded-md font-semibold hover:bg-blue-50 transition">
+                            View Full Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Players Section -->
+        <section id="playersSection">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Full Squad</h2>
+            
+            <div id="squadGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Player cards will be populated here -->
+                <div class="animate-pulse bg-gray-200 rounded-xl h-96"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-96"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-96"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-96"></div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="mt-12 text-center">
+                <button id="loadMoreBtn" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-md font-semibold hover:bg-gray-300 transition">
+                    Load More Players
+                </button>
+            </div>
+        </section>
+
+        <!-- Manager Section -->
+        <section id="managerSection" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Chelsea FC Managers</h2>
+            
+            <!-- Manager Search Section -->
+            <div class="mb-8">
+                <div class="max-w-2xl mx-auto search-container">
+                    <div class="relative">
+                        <input type="text" id="managerSearch" placeholder="Search past Chelsea managers..." 
+                               class="w-full px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                        <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Manager Search Results Dropdown -->
+                    <div id="managerSearchSuggestions" class="search-results hidden mt-1 bg-white rounded-md shadow-lg border border-gray-200">
+                        <!-- Manager search suggestions will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Current Manager</h3>
+            
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="md:flex">
+                    <div class="md:flex-shrink-0 md:w-1/3">
+                        <div class="h-64 md:h-full bg-gray-300 relative">
+                            <img id="managerImage" class="w-full h-full object-cover" style="display: none;" alt="Manager">
+                            <div id="managerImagePlaceholder" class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-user-tie text-6xl text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 md:w-2/3">
+                        <h3 id="managerName" class="text-3xl font-bold text-gray-800 mb-2">Loading...</h3>
+                        <p id="managerDetails" class="text-lg text-gray-600 mb-4">Loading...</p>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Career Information</h4>
+                                <p class="text-sm text-gray-600 mb-1">Age: <span id="managerAge">--</span></p>
+                                <p class="text-sm text-gray-600 mb-1">Nationality: <span id="managerNationality">--</span></p>
+                                <p class="text-sm text-gray-600">Years at Club: <span id="managerYears">--</span></p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Previous Clubs</h4>
+                                <div id="managerPreviousClubs" class="text-sm text-gray-600">
+                                    <!-- Previous clubs will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-semibold text-gray-700 mb-2">Achievements</h4>
+                            <div id="managerAchievements" class="space-y-1">
+                                <!-- Achievements will be populated here -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            <!-- Search Results Section -->
+            <div id="managerSearchResults" class="hidden mt-12">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6">Search Results</h3>
+                <div id="managerSearchContainer">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="statisticsSection" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Squad Statistics</h2>
+            
+            <!-- Enhanced Key Metrics Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-blue-600 mb-2" id="totalPlayers">--</div>
+                    <div class="text-gray-600 text-sm">Total Players</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-green-600 mb-2" id="averageAge">--</div>
+                    <div class="text-gray-600 text-sm">Average Age</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-yellow-600 mb-2" id="totalValue">--</div>
+                    <div class="text-gray-600 text-sm">Total Value</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-red-600 mb-2" id="totalNationalities">--</div>
+                    <div class="text-gray-600 text-sm">Nationalities</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-purple-600 mb-2" id="academyGraduates">--</div>
+                    <div class="text-gray-600 text-sm">Academy Graduates</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-indigo-600 mb-2" id="internationalPlayers">--</div>
+                    <div class="text-gray-600 text-sm">International Players</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-pink-600 mb-2" id="weeklyWageBill">--</div>
+                    <div class="text-gray-600 text-sm">Weekly Wage Bill</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+                    <div class="text-3xl font-bold text-cyan-600 mb-2" id="avgMarketValue">--</div>
+                    <div class="text-gray-600 text-sm">Avg Market Value</div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Position Breakdown</h3>
+                    <div id="positionBreakdown" class="space-y-3">
+                        <!-- Position breakdown will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Top Signings</h3>
+                    <div id="topSignings" class="space-y-3">
+                        <!-- Top signings will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Analysis Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-pound-sign mr-2 text-green-600"></i>
+                        Financial Analysis
+                    </h3>
+                    <div id="financialAnalysis" class="space-y-4">
+                        <!-- Financial analysis will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-pie mr-2 text-yellow-600"></i>
+                        Transfer Analysis
+                    </h3>
+                    <div id="transferAnalysis" class="space-y-4">
+                        <!-- Transfer analysis will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Squad Demographics Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-birthday-cake mr-2 text-blue-600"></i>
+                        Age Distribution
+                    </h3>
+                    <div id="ageDistribution" class="space-y-3">
+                        <!-- Age distribution will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-globe mr-2 text-red-600"></i>
+                        Nationality Breakdown
+                    </h3>
+                    <div id="nationalityBreakdown" class="space-y-2">
+                        <!-- Nationality breakdown will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-clock mr-2 text-purple-600"></i>
+                        Experience Levels
+                    </h3>
+                    <div id="experienceLevels" class="space-y-3">
+                        <!-- Experience levels will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tactical Analysis Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-running mr-2 text-green-600"></i>
+                        Tactical Insights
+                    </h3>
+                    <div id="tacticalInsights" class="space-y-4">
+                        <!-- Tactical insights will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-ruler-vertical mr-2 text-indigo-600"></i>
+                        Physical Statistics
+                    </h3>
+                    <div id="physicalStats" class="space-y-4">
+                        <!-- Physical statistics will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract & Timeline Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-calendar-alt mr-2 text-pink-600"></i>
+                        Contract Timeline
+                    </h3>
+                    <div id="contractTimeline" class="space-y-3">
+                        <!-- Contract timeline will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-history mr-2 text-cyan-600"></i>
+                        Squad Evolution
+                    </h3>
+                    <div id="squadEvolution" class="space-y-3">
+                        <!-- Squad evolution will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-trophy mr-2 text-yellow-600"></i>
+                        Trophy Winners
+                    </h3>
+                    <div id="trophyWinners" class="space-y-3">
+                        <!-- Trophy winners will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-flag mr-2 text-blue-600"></i>
+                        International Experience
+                    </h3>
+                    <div id="internationalExperience" class="space-y-3">
+                        <!-- International experience will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-exchange-alt mr-2 text-purple-600"></i>
+                        Previous Clubs
+                    </h3>
+                    <div id="previousClubs" class="space-y-2">
+                        <!-- Previous clubs will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="aboutSection" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">About Blue's Book</h2>
+            
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-2xl">CFC</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-4">Blue's Book</h3>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                        The definitive digital reference for comprehensive, real-time information about current Chelsea FC players and management.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-search text-blue-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Fast Search</h4>
+                        <p class="text-gray-600 text-sm">Quick autocomplete search to find any Chelsea player instantly</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-database text-green-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Real-time Data</h4>
+                        <p class="text-gray-600 text-sm">Always up-to-date player information and statistics</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-mobile-alt text-yellow-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Mobile First</h4>
+                        <p class="text-gray-600 text-sm">Optimized for all devices with responsive design</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-filter text-red-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Advanced Filters</h4>
+                        <p class="text-gray-600 text-sm">Filter players by position, nationality, and more</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-random text-purple-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Player Discovery</h4>
+                        <p class="text-gray-600 text-sm">Discover random players and explore the squad</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-code text-indigo-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Developer API</h4>
+                        <p class="text-gray-600 text-sm">RESTful API for developers and integrations</p>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-8 border-t border-gray-200">
+                    <div class="text-center">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4">Keep The Blue Flag Flying High!</h4>
+                        <p class="text-gray-600 mb-6">
+                            Built with 💙 for Chelsea FC fans worldwide. This project is a tribute to the club, players, and the incredible fanbase that makes Chelsea special.
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="https://github.com/Nio-33/blue-sbook" class="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition">
+                                <i class="fab fa-github mr-2"></i>GitHub
+                            </a>
+                            <a href="/api" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                                <i class="fas fa-code mr-2"></i>API Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-16">
-        <div class="container mx-auto px-4 text-center">
-            <div class="mb-4">
-                <div class="text-2xl font-bold mb-2">Blue's Book</div>
-                <p class="text-gray-400">The definitive digital reference for Chelsea FC squad information</p>
-            </div>
-            <div class="text-sm text-gray-500">
-                <p>Made with 💙 for Chelsea FC fans worldwide</p>
-                <p class="mt-2">Keep The Blue Flag Flying High! KTBFFH</p>
+    <!-- Player Profile Modal -->
+    <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 id="modalPlayerName" class="text-2xl font-bold text-gray-800"></h3>
+                        <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="modalContent">
+                        <!-- Player details will be populated here -->
+                    </div>
+                </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen">
             <div class="bg-white rounded-lg p-8 text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p class="text-gray-600">Loading...</p>
+                <div class="loading-spinner"></div>
+                <p class="text-gray-600 mt-4">Loading...</p>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Blue's Book</h3>
+                    <p class="text-gray-400">The definitive digital reference for Chelsea FC squad information.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Features</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Player Search</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Player Profiles</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Random Player</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Statistics</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/api" class="text-gray-400 hover:text-white transition">API Documentation</a></li>
+                        <li><a href="https://github.com/Nio-33/blue-sbook" class="text-gray-400 hover:text-white transition">Contribute</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-discord text-xl"></i>
+                        </a>
+                        <a href="https://github.com/Nio-33/blue-sbook" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-400">support@bluesbook.app</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">© 2025 Blue's Book. All rights reserved.</p>
+                <p class="text-gray-400 mt-4 md:mt-0">Made with 💙 for Chelsea FC fans worldwide | KTBFFH</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- JavaScript -->
     <script src="js/app.js"></script>
@@ -159,4 +747,3 @@
     <script src="js/player.js"></script>
 </body>
 </html>
-

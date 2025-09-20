@@ -2,11 +2,12 @@
 
 /* Custom color palette for Chelsea FC branding */
 :root {
-  --chelsea-blue: #1e40af;
-  --chelsea-light-blue: #3b82f6;
-  --chelsea-dark-blue: #1e3a8a;
+  --chelsea-blue: #034694;
+  --chelsea-light-blue: #0052CC;
+  --chelsea-dark-blue: #002F5F;
   --chelsea-white: #ffffff;
   --chelsea-gray: #6b7280;
+  --chelsea-yellow: #FFD700;
 }
 
 /* Custom Tailwind configuration */
@@ -17,11 +18,11 @@
 /* Custom components */
 @layer components {
   .player-card {
-    @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer;
+    @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100;
   }
   
   .player-card:hover {
-    @apply transform scale-105;
+    @apply transform scale-105 border-blue-300 shadow-xl;
   }
   
   .search-input {
@@ -57,7 +58,15 @@
   }
   
   .jersey-number {
-    @apply bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold;
+    @apply bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-sm;
+  }
+  
+  .chelsea-gradient {
+    background: linear-gradient(135deg, var(--chelsea-blue) 0%, var(--chelsea-light-blue) 100%);
+  }
+  
+  .chelsea-header {
+    background: linear-gradient(135deg, var(--chelsea-dark-blue) 0%, var(--chelsea-blue) 100%);
   }
   
   .fun-fact {
