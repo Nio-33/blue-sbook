@@ -55,9 +55,12 @@ def send_message():
         query_time = (time.time() - start_time) * 1000
         
         # Add timing information
-        if response_data.get('success'):
-            response_data['query_time'] = f"{query_time:.2f}ms"
-            response_data['timestamp'] = int(time.time() * 1000)
+        response_data['query_time'] = f"{query_time:.2f}ms"
+        response_data['timestamp'] = int(time.time() * 1000)
+        
+        # If there's a configuration error, return appropriate status code
+        if not response_data.get('success', False) and 'not configured' in response_data.get('error', ''):
+            return jsonify(response_data), 503  # Service Unavailable
         
         return jsonify(response_data)
         

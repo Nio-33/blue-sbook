@@ -116,6 +116,12 @@ class BluesBookApp {
             item.addEventListener('click', this.handleNavigation.bind(this));
         });
         
+        // Landing page navigation triggers
+        const navTriggers = document.querySelectorAll('.nav-trigger');
+        navTriggers.forEach(trigger => {
+            trigger.addEventListener('click', this.handleNavigation.bind(this));
+        });
+        
         // Chat functionality
         this.setupChatEventListeners();
         
@@ -127,18 +133,24 @@ class BluesBookApp {
     }
     
     setDefaultNavigation() {
-        // Set Players as the default active navigation
-        const playersNavItem = document.querySelector('[data-section="players"]');
-        if (playersNavItem) {
-            playersNavItem.classList.add('active');
+        // Set Home as the default active navigation
+        const homeNavItem = document.querySelector('[data-section="homeSection"]');
+        if (homeNavItem) {
+            homeNavItem.classList.add('active');
         }
         
-        // Ensure player-specific sections are visible by default
-        const playerSpecificSections = ['searchSection', 'filtersSection', 'featuredSection', 'playersSection'];
+        // Show home section by default
+        const homeSection = document.getElementById('homeSection');
+        if (homeSection) {
+            homeSection.classList.remove('hidden');
+        }
+        
+        // Hide player-specific sections by default (shown when navigating to Players)
+        const playerSpecificSections = ['searchSection', 'filtersSection', 'featuredSection', 'playersSection', 'originalHero'];
         playerSpecificSections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
-                element.classList.remove('hidden');
+                element.classList.add('hidden');
             }
         });
         
@@ -156,10 +168,10 @@ class BluesBookApp {
         try {
             this.showLoading();
             
-            // Load random player
-            await this.loadRandomPlayer();
+            // Load home page data (featured player and quick stats)
+            await this.loadHomePageData();
             
-            // Load squad
+            // Pre-load squad data for better UX when navigating to Players
             await this.loadSquad();
             
         } catch (error) {
@@ -738,36 +750,173 @@ class BluesBookApp {
         
         // Show selected section and load data
         switch(section) {
+            case 'homeSection':
+                this.showSection('homeSection');
+                this.loadHomePageData();
+                break;
             case 'players':
                 this.showSection('playersSection');
+                this.showPlayerSpecificSections();
                 // Players data is already loaded
                 break;
-            case 'manager':
+            case 'managerSection':
                 this.showSection('managerSection');
+                this.hidePlayerSpecificSections();
                 this.loadManagerData();
                 this.clearManagerSearch();
                 break;
-            case 'statistics':
+            case 'statisticsSection':
                 this.showSection('statisticsSection');
+                this.hidePlayerSpecificSections();
                 this.loadStatisticsData();
                 break;
-            case 'chat':
+            case 'chatSection':
                 this.showSection('chatSection');
+                this.hidePlayerSpecificSections();
                 this.loadChatData();
                 break;
-            case 'about':
+            case 'aboutSection':
                 this.showSection('aboutSection');
+                this.hidePlayerSpecificSections();
                 // About section is static, no data loading needed
                 break;
         }
     }
     
     showSection(sectionId) {
+        // Hide all main sections first
+        const allSections = ['homeSection', 'playersSection', 'managerSection', 'statisticsSection', 'chatSection', 'aboutSection'];
+        allSections.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.add('hidden');
+            }
+        });
+        
+        // Show the requested section
         const section = document.getElementById(sectionId);
         if (section) {
             section.classList.remove('hidden');
             section.classList.add('fade-in');
         }
+    }
+    
+    showPlayerSpecificSections() {
+        const playerSections = ['searchSection', 'filtersSection', 'featuredSection', 'originalHero'];
+        playerSections.forEach(sectionId => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.classList.remove('hidden');
+            }
+        });
+    }
+    
+    hidePlayerSpecificSections() {
+        const playerSections = ['searchSection', 'filtersSection', 'featuredSection', 'originalHero'];
+        playerSections.forEach(sectionId => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.classList.add('hidden');
+            }
+        });
+    }
+    
+    async loadHomePageData() {
+        try {
+            // Load featured player for home page
+            await this.loadFeaturedPlayerForHome();
+            
+            // Load quick stats for home page
+            await this.loadQuickStatsForHome();
+            
+        } catch (error) {
+            console.error('Error loading home page data:', error);
+        }
+    }
+    
+    async loadFeaturedPlayerForHome() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/players/random`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayFeaturedPlayerOnHome(data.data);
+            }
+        } catch (error) {
+            console.error('Error loading featured player for home:', error);
+            const homePlayerElement = document.getElementById('homePageFeaturedPlayer');
+            if (homePlayerElement) {
+                homePlayerElement.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i>
+                        <p class="theme-text-secondary">Unable to load featured player</p>
+                    </div>
+                `;
+            }
+        }
+    }
+    
+    async loadQuickStatsForHome() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/players/statistics/advanced`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayQuickStatsOnHome(data.data);
+            }
+        } catch (error) {
+            console.error('Error loading quick stats for home:', error);
+            // Set fallback values
+            document.getElementById('quickStatsPlayers').textContent = '--';
+            document.getElementById('quickStatsAge').textContent = '--';
+            document.getElementById('quickStatsValue').textContent = '--';
+            document.getElementById('quickStatsNations').textContent = '--';
+        }
+    }
+    
+    displayFeaturedPlayerOnHome(player) {
+        const homePlayerElement = document.getElementById('homePageFeaturedPlayer');
+        if (homePlayerElement && player) {
+            homePlayerElement.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user text-gray-400 text-2xl"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                        <h4 class="font-bold theme-text-primary text-lg">${player.name}</h4>
+                        <p class="theme-text-secondary text-sm">${player.position} • #${player.jersey_number}</p>
+                        <p class="theme-text-secondary text-sm">${player.nationality} • ${player.age} years old</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button class="nav-trigger bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition" data-section="players">
+                        View Full Squad
+                    </button>
+                </div>
+            `;
+            
+            // Re-add event listeners for new nav-trigger buttons
+            this.setupNavTriggerListeners();
+        }
+    }
+    
+    displayQuickStatsOnHome(stats) {
+        if (stats && stats.basic_metrics) {
+            const metrics = stats.basic_metrics;
+            
+            document.getElementById('quickStatsPlayers').textContent = metrics.total_players || '--';
+            document.getElementById('quickStatsAge').textContent = metrics.average_age || '--';
+            document.getElementById('quickStatsValue').textContent = metrics.total_market_value || '--';
+            document.getElementById('quickStatsNations').textContent = metrics.nationalities || '--';
+        }
+    }
+    
+    setupNavTriggerListeners() {
+        const navTriggers = document.querySelectorAll('.nav-trigger');
+        navTriggers.forEach(trigger => {
+            trigger.removeEventListener('click', this.handleNavigation.bind(this));
+            trigger.addEventListener('click', this.handleNavigation.bind(this));
+        });
     }
     
     async loadManagerData() {

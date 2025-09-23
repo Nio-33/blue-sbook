@@ -31,6 +31,23 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
     app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
     
+    # Debug environment variables (only in development)
+    if app.config['FLASK_ENV'] == 'development':
+        gemini_key = os.getenv('GEMINI_API_KEY')
+        if gemini_key:
+            print(f"✅ GEMINI_API_KEY loaded: {gemini_key[:10]}...")
+        else:
+            print("❌ GEMINI_API_KEY not found in environment variables")
+        
+        api_football_key = os.getenv('API_FOOTBALL_KEY')
+        if api_football_key and api_football_key != 'your-api-football-key-here':
+            print(f"✅ API_FOOTBALL_KEY loaded: {api_football_key[:10]}...")
+        else:
+            print("⚠️ API_FOOTBALL_KEY not configured (optional)")
+            
+        print(f"📁 Environment file location: {project_root / '.env'}")
+        print(f"🔍 Environment file exists: {(project_root / '.env').exists()}")
+    
     # Enable CORS for frontend
     CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:5000', 'http://localhost:5000'])
     
@@ -60,9 +77,48 @@ def create_app():
                 'managers': '/api/v1/managers',
                 'search': '/api/v1/search',
                 'chat': '/api/v1/chat',
-                'health': '/health'
+                'health': '/health',
+                'debug': '/debug'
             }
         })
+    
+    # Debug endpoint for API configuration
+    @app.route('/debug')
+    def debug_config():
+        """Debug endpoint to check API configuration"""
+        if app.config['FLASK_ENV'] != 'development':
+            return jsonify({'error': 'Debug endpoint only available in development'}), 403
+            
+        # Import here to avoid circular imports
+        from services.gemini_service import GeminiService
+        
+        debug_info = {
+            'environment': app.config['FLASK_ENV'],
+            'gemini_api_key_configured': bool(os.getenv('GEMINI_API_KEY')),
+            'api_football_key_configured': bool(os.getenv('API_FOOTBALL_KEY') and os.getenv('API_FOOTBALL_KEY') != 'your-api-football-key-here'),
+            'env_file_exists': (Path(__file__).parent.parent / '.env').exists()
+        }
+        
+        # Test Gemini service
+        try:
+            gemini_service = GeminiService()
+            debug_info['gemini_service_initialized'] = True
+            debug_info['gemini_api_key_present'] = bool(gemini_service.api_key)
+            
+            # Quick API test
+            if gemini_service.api_key:
+                test_response = gemini_service.generate_response("Test")
+                debug_info['gemini_api_test'] = {
+                    'success': test_response.get('success', False),
+                    'error': test_response.get('error') if not test_response.get('success', False) else None
+                }
+            else:
+                debug_info['gemini_api_test'] = {'success': False, 'error': 'No API key'}
+                
+        except Exception as e:
+            debug_info['gemini_service_error'] = str(e)
+            
+        return jsonify(debug_info)
     
     # Serve the main frontend application
     @app.route('/')

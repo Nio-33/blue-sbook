@@ -33,8 +33,12 @@ class GeminiService:
         self.api_key = os.getenv('GEMINI_API_KEY')
         self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
         
+        # Enhanced logging for debugging
         if not self.api_key:
-            logger.warning("GEMINI_API_KEY not found in environment variables")
+            logger.error("GEMINI_API_KEY not found in environment variables")
+            logger.error("Please ensure your .env file contains a valid GEMINI_API_KEY")
+        else:
+            logger.info(f"GEMINI_API_KEY loaded successfully: {self.api_key[:10]}...")
             
         # Chelsea FC context for prompt engineering
         self.chelsea_context = self._load_chelsea_context()
@@ -50,7 +54,7 @@ class GeminiService:
         
         === RESPONSE GUIDELINES ===
         - ACCURACY IS PARAMOUNT: Always double-check trophy facts
-        - For "last trophy" questions: ALWAYS mention FIFA Club World Cup 2022
+        - For "last trophy" questions: ALWAYS mention FIFA Club World Cup 2025 vs PSG
         - Be specific with dates, managers, and match details
         - When discussing trophies, mention the complete count
         - If uncertain about recent events (2022+), acknowledge limitations
@@ -59,7 +63,7 @@ class GeminiService:
         - Include specific years, venues, and key players when relevant
         
         === COMMON CORRECTIONS ===
-        - Last major trophy: FIFA Club World Cup 2022 (NOT Champions League 2021)
+        - Last major trophy: FIFA Club World Cup 2025 vs PSG (NOT Champions League 2021)
         - Champions League wins: 2012 AND 2021 (both important)
         - Current manager: Enzo Maresca (2024-Present)
         - Current owner: Todd Boehly consortium (2022-Present)
@@ -178,10 +182,15 @@ class GeminiService:
             Dict with response data or error information
         """
         if not self.api_key:
+            logger.error("Attempted to generate response without API key")
             return {
                 'success': False,
                 'error': 'Gemini API key not configured',
-                'message': "I'm sorry, but the AI chat service is not currently available. Please check back later."
+                'message': "I'm sorry, but the AI chat service is not currently available. The Gemini API key is not configured. Please check the server configuration.",
+                'debug_info': {
+                    'api_key_present': False,
+                    'env_var_name': 'GEMINI_API_KEY'
+                }
             }
         
         try:

@@ -130,7 +130,7 @@ CHELSEA_HISTORY = {
             "period": "2022-Present",
             "owner": "Todd Boehly consortium",
             "highlights": [
-                "FIFA Club World Cup 2022 (first trophy under new ownership)",
+                "FIFA Club World Cup 2025 vs PSG (first trophy under new ownership)",
                 "Record transfer spending",
                 "Youth development focus"
             ]
@@ -188,7 +188,7 @@ CHELSEA_LEGENDS = {
         {
             "name": "Thiago Silva",
             "position": "Defender",
-            "achievements": ["Champions League 2021", "FIFA Club World Cup 2022"],
+            "achievements": ["Champions League 2021", "FIFA Club World Cup 2025"],
             "significance": "Leadership and experience"
         },
         {
@@ -224,7 +224,7 @@ CHELSEA_MANAGERS = {
         {
             "name": "Thomas Tuchel",
             "period": "2021-2022",
-            "achievements": ["Champions League 2021", "FIFA Club World Cup 2022"],
+            "achievements": ["Champions League 2021"],
             "significance": "Immediate impact - Champions League in 5 months"
         }
     ],
@@ -257,15 +257,15 @@ def get_comprehensive_context() -> str:
     COMPREHENSIVE CHELSEA FC KNOWLEDGE BASE - UPDATED {datetime.now().year}
     
     === CRITICAL RECENT FACTS ===
-    - LAST MAJOR TROPHY: FIFA Club World Cup 2022 (defeated Palmeiras 2-1 aet)
+    - LAST MAJOR TROPHY: FIFA Club World Cup 2025 (defeated PSG)
     - This was Chelsea's FIRST FIFA Club World Cup title
-    - Won under Thomas Tuchel in February 2022 in Abu Dhabi
-    - Scorers: Thiago Silva, Kai Havertz (winning goal)
+    - Won in 2025 under current management
+    - Historic victory against PSG in 2025
     
     === COMPLETE MAJOR TROPHY COUNT ===
     Premier League: 6 titles (2004-05, 2005-06, 2009-10, 2014-15, 2016-17, 2020-21)
     Champions League: 2 titles (2012, 2021)
-    FIFA Club World Cup: 1 title (2022) ← MOST RECENT MAJOR TROPHY
+    FIFA Club World Cup: 1 title (2025) ← MOST RECENT MAJOR TROPHY
     UEFA Europa League: 2 titles (2013, 2019)
     UEFA Cup Winners' Cup: 2 titles (1971, 1998)
     FA Cup: 8 titles (1970, 1997, 2000, 2007, 2009, 2010, 2012, 2018)
@@ -285,10 +285,10 @@ def get_comprehensive_context() -> str:
     2. Swinging Sixties (1960s-70s): First European trophy (1971)
     3. Modern Revival (1990s-2003): Cup Winners' Cup 1998
     4. Abramovich Era (2003-2022): Golden period - 21 major trophies
-    5. Boehly Era (2022-Present): New ownership, FIFA Club World Cup 2022
+    5. Boehly Era (2022-Present): New ownership, FIFA Club World Cup 2025 vs PSG
     
     === ACCURACY REQUIREMENTS ===
-    - Always mention FIFA Club World Cup 2022 as the most recent major trophy
+    - Always mention FIFA Club World Cup 2025 vs PSG as the most recent major trophy
     - Be precise with dates and facts
     - When unsure about recent events, acknowledge limitations
     - Cross-reference trophy counts with this database
@@ -336,12 +336,12 @@ def verify_trophy_fact(question: str, answer: str) -> Dict[str, Any]:
     
     # Check for "last trophy" questions
     if "last" in question_lower and "trophy" in question_lower:
-        if "fifa club world cup" not in answer_lower or "2022" not in answer_lower:
+        if ("fifa club world cup" not in answer_lower or "2025" not in answer_lower) and not ("psg" in answer_lower or "paris saint-germain" in answer_lower):
             verification["is_accurate"] = False
             verification["corrections"].append({
                 "error": "Incorrect last trophy information",
-                "correction": "Chelsea's last major trophy was the FIFA Club World Cup in 2022, defeating Palmeiras 2-1 after extra time in Abu Dhabi.",
-                "date": "February 12, 2022"
+                "correction": "Chelsea's last major trophy was the FIFA Club World Cup in 2025, defeating PSG.",
+                "date": "2025"
             })
     
     # Check Champions League facts

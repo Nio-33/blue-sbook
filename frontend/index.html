@@ -377,11 +377,12 @@
                 </div>
                 
                 <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="homeSection">Home</a>
                     <a href="#" class="nav-item font-medium header-nav-text" data-section="players">Players</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="manager">Manager</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="statistics">Statistics</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="chat">Chat</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="about">About</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="managerSection">Manager</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="statisticsSection">Statistics</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="chatSection">Chat</a>
+                    <a href="#" class="nav-item font-medium header-nav-text" data-section="aboutSection">About</a>
                 </nav>
                 
                 <div class="flex items-center space-x-4">
@@ -399,8 +400,153 @@
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- Hero Section -->
-        <section class="mb-12 text-center">
+        <!-- Landing Page Section -->
+        <section id="homeSection">
+            <!-- Hero Section -->
+            <div class="mb-16 text-center">
+                <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 rounded-2xl shadow-2xl overflow-hidden mb-12">
+                    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                    <div class="relative px-8 py-16 md:py-24">
+                        <div class="flex justify-center mb-6">
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center p-3 shadow-lg">
+                                <img src="images/chelsea-logo-official.svg" alt="Chelsea FC Official Logo" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                        <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">Blue's Book</h1>
+                        <p class="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto mb-8">
+                            The definitive digital reference for comprehensive, real-time information about current Chelsea FC players, management, and club history.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button class="nav-trigger bg-white text-blue-800 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition shadow-lg" data-section="players">
+                                <i class="fas fa-users mr-2"></i>Explore Squad
+                            </button>
+                            <button class="nav-trigger bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg border-2 border-blue-600" data-section="chatSection">
+                                <i class="fas fa-comments mr-2"></i>Ask Chelsea AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="nav-trigger theme-card rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:scale-105" data-section="players">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold theme-text-primary mb-2">Full Squad</h3>
+                    <p class="theme-text-secondary text-sm">Explore all 25 current Chelsea FC players with detailed profiles, stats, and information</p>
+                    <div class="mt-4 text-blue-600 font-medium">View Players →</div>
+                </div>
+
+                <div class="nav-trigger theme-card rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:scale-105" data-section="managerSection">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-tie text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold theme-text-primary mb-2">Management</h3>
+                    <p class="theme-text-secondary text-sm">Learn about Enzo Maresca and search historical Chelsea managers and their achievements</p>
+                    <div class="mt-4 text-green-600 font-medium">View Manager →</div>
+                </div>
+
+                <div class="nav-trigger theme-card rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:scale-105" data-section="statisticsSection">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-yellow-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold theme-text-primary mb-2">Squad Statistics</h3>
+                    <p class="theme-text-secondary text-sm">Advanced analytics, financial breakdown, demographics, and comprehensive squad insights</p>
+                    <div class="mt-4 text-yellow-600 font-medium">View Stats →</div>
+                </div>
+
+                <div class="nav-trigger theme-card rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:scale-105" data-section="chatSection">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold theme-text-primary mb-2">Chelsea AI Chat</h3>
+                    <p class="theme-text-secondary text-sm">Ask anything about Chelsea FC history, trophies, players, and get intelligent AI responses</p>
+                    <div class="mt-4 text-purple-600 font-medium">Start Chatting →</div>
+                </div>
+            </div>
+
+            <!-- Featured Content Preview -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <!-- Today's Featured Player Preview -->
+                <div class="theme-card rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold theme-text-primary">Featured Player</h3>
+                            <button class="nav-trigger text-blue-600 hover:text-blue-800 transition" data-section="players">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="homePageFeaturedPlayer" class="text-center">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="theme-text-secondary">Loading featured player...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Preview -->
+                <div class="theme-card rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold theme-text-primary">Squad Overview</h3>
+                            <button class="nav-trigger text-blue-600 hover:text-blue-800 transition" data-section="statisticsSection">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="homePageQuickStats" class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600" id="quickStatsPlayers">--</div>
+                                <div class="text-sm theme-text-secondary">Total Players</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600" id="quickStatsAge">--</div>
+                                <div class="text-sm theme-text-secondary">Average Age</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-600" id="quickStatsValue">--</div>
+                                <div class="text-sm theme-text-secondary">Total Value</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-red-600" id="quickStatsNations">--</div>
+                                <div class="text-sm theme-text-secondary">Nationalities</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Updates/News Section -->
+            <div class="theme-card rounded-xl shadow-lg p-8 mb-12">
+                <h3 class="text-2xl font-bold theme-text-primary mb-6 text-center">Latest Updates</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-database text-blue-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold theme-text-primary mb-2">Real-time Data</h4>
+                        <p class="theme-text-secondary text-sm">Player information updated for 2024-25 season with comprehensive statistics and profiles</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-brain text-purple-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold theme-text-primary mb-2">Enhanced AI Chat</h4>
+                        <p class="theme-text-secondary text-sm">Upgraded AI assistant with 120+ years of Chelsea FC history and intelligent responses</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-mobile-alt text-green-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold theme-text-primary mb-2">Mobile Optimized</h4>
+                        <p class="theme-text-secondary text-sm">Fully responsive design with dark/light themes for the best experience on any device</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Original Hero Section (for other pages) -->
+        <section class="mb-12 text-center hidden" id="originalHero">
             <h2 class="text-4xl font-bold text-gray-800 theme-text-primary mb-4">Chelsea FC Squad Reference</h2>
             <p class="text-xl theme-text-secondary max-w-3xl mx-auto">
                 The definitive digital reference for comprehensive, real-time information about current Chelsea FC players and management.
@@ -1023,7 +1169,7 @@
     <footer class="theme-card mt-16 py-6 text-center theme-border border-t">
         <div class="container mx-auto px-4">
             <p class="theme-text-secondary text-sm">
-                Blue's Book: Chelsea's Diary | powered by Niostudio
+                Chelsea's Diary | powered by <span class="italic text-blue-600">Niostudio</span>
             </p>
         </div>
     </footer>
