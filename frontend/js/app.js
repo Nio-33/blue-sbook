@@ -128,6 +128,9 @@ class BluesBookApp {
         // Theme functionality
         this.setupThemeEventListener();
         
+        // Sidebar functionality
+        this.setupSidebarEventListeners();
+        
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
     }
@@ -1779,6 +1782,128 @@ class BluesBookApp {
                 themeIcon.className = 'fas fa-sun text-lg';
                 themeIcon.parentElement.title = 'Switch to Light Theme';
             }
+        }
+    }
+    
+    // Sidebar management methods
+    setupSidebarEventListeners() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', this.toggleSidebar.bind(this));
+        }
+        
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', this.closeSidebar.bind(this));
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', this.closeSidebar.bind(this));
+        }
+        
+        // Add click handlers for sidebar navigation items
+        sidebarNavItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                this.handleSidebarNavigation(e);
+            });
+        });
+        
+        // Close sidebar on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isSidebarOpen()) {
+                this.closeSidebar();
+            }
+        });
+    }
+    
+    toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            if (this.isSidebarOpen()) {
+                this.closeSidebar();
+            } else {
+                this.openSidebar();
+            }
+        }
+    }
+    
+    openSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('main');
+        
+        if (sidebar) {
+            sidebar.classList.add('open');
+        }
+        
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.classList.add('show');
+        }
+        
+        // Add shift to main content on desktop
+        if (window.innerWidth >= 1024 && mainContent) {
+            mainContent.classList.add('main-content-shift');
+        }
+        
+        // Prevent body scroll when sidebar is open on mobile
+        if (window.innerWidth < 1024) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('main');
+        
+        if (sidebar) {
+            sidebar.classList.remove('open');
+        }
+        
+        if (overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+        
+        // Remove shift from main content
+        if (mainContent) {
+            mainContent.classList.remove('main-content-shift');
+        }
+        
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+    
+    isSidebarOpen() {
+        const sidebar = document.getElementById('sidebar');
+        return sidebar && sidebar.classList.contains('open');
+    }
+    
+    handleSidebarNavigation(event) {
+        event.preventDefault();
+        
+        // Get the target section from the clicked item
+        const section = event.currentTarget.getAttribute('data-section');
+        
+        if (section) {
+            // Update active states in sidebar
+            const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item');
+            sidebarNavItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 1024) {
+                this.closeSidebar();
+            }
+            
+            // Handle the navigation using the existing navigation system
+            this.handleNavigation({ target: event.currentTarget });
         }
     }
     

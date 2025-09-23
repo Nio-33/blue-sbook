@@ -64,15 +64,6 @@
             border-bottom: 1px solid var(--border-color);
         }
         
-        /* Header text colors - Chelsea blue for light theme */
-        .header-nav-text {
-            color: var(--chelsea-blue);
-            transition: color 0.3s ease;
-        }
-        
-        .header-nav-text:hover {
-            color: var(--chelsea-light-blue);
-        }
         
         /* Header title styling - Chelsea blue for light theme */
         .header-title {
@@ -80,36 +71,11 @@
             transition: color 0.3s ease;
         }
         
-        /* Dark theme header text - use light colors */
-        [data-theme="dark"] .header-nav-text {
-            color: var(--text-primary);
-        }
-        
-        [data-theme="dark"] .header-nav-text:hover {
-            color: var(--chelsea-light-blue);
-        }
         
         [data-theme="dark"] .header-title {
             color: var(--text-primary);
         }
         
-        /* Mobile menu button - follows header text pattern */
-        .mobile-menu-btn {
-            color: var(--chelsea-blue);
-            transition: color 0.3s ease;
-        }
-        
-        .mobile-menu-btn:hover {
-            color: var(--chelsea-light-blue);
-        }
-        
-        [data-theme="dark"] .mobile-menu-btn {
-            color: var(--text-primary);
-        }
-        
-        [data-theme="dark"] .mobile-menu-btn:hover {
-            color: var(--chelsea-light-blue);
-        }
         
         .btn-primary {
             background-color: var(--chelsea-blue);
@@ -362,6 +328,89 @@
             transition-duration: 0.3s;
             transition-timing-function: ease;
         }
+        
+        /* Sidebar Styles */
+        #sidebar {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        #sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .sidebar-nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-nav-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .sidebar-nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--chelsea-blue), var(--chelsea-light-blue));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .sidebar-nav-item:hover::before,
+        .sidebar-nav-item.active::before {
+            transform: scaleY(1);
+        }
+        
+        .sidebar-nav-item.active {
+            background: rgba(3, 70, 148, 0.1);
+            color: var(--chelsea-blue);
+        }
+        
+        [data-theme="dark"] .sidebar-nav-item.active {
+            background: rgba(108, 160, 220, 0.2);
+        }
+        
+        /* Sidebar Toggle Button */
+        #sidebarToggle {
+            transition: all 0.3s ease;
+        }
+        
+        #sidebarToggle:hover {
+            transform: scale(1.1);
+            rotate: 90deg;
+        }
+        
+        /* Sidebar toggle visible on all screen sizes */
+        
+        /* Sidebar responsive behavior */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 280px;
+            }
+        }
+        
+        /* Main content shift when sidebar is open on desktop */
+        @media (min-width: 1024px) {
+            .main-content-shift {
+                margin-left: 256px;
+                transition: margin-left 0.3s ease;
+            }
+        }
+        
+        /* Sidebar overlay animation */
+        #sidebarOverlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        #sidebarOverlay.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -376,27 +425,81 @@
                     <h1 class="text-2xl font-bold header-title">Blue's Book</h1>
                 </div>
                 
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="homeSection">Home</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="players">Players</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="managerSection">Manager</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="statisticsSection">Statistics</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="chatSection">Chat</a>
-                    <a href="#" class="nav-item font-medium header-nav-text" data-section="aboutSection">About</a>
-                </nav>
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center">
                     <!-- Theme Toggle Button -->
                     <button id="themeToggle" class="theme-card theme-text-primary p-2 rounded-lg transition-all duration-300 hover:opacity-80" title="Toggle Theme">
                         <i class="fas fa-moon text-lg" id="themeIcon"></i>
-                    </button>
-                    <button class="md:hidden mobile-menu-btn">
-                        <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebarToggle" class="fixed top-20 left-4 z-50 p-3 theme-card rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+        <i class="fas fa-bars text-xl theme-text-primary"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 theme-card shadow-xl transform -translate-x-full transition-transform duration-300 ease-in-out z-40">
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between p-6 theme-border border-b">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1">
+                    <img src="images/chelsea-logo-official.svg" alt="Chelsea FC" class="w-full h-full object-contain">
+                </div>
+                <h2 class="text-xl font-bold theme-text-primary">Blue's Book</h2>
+            </div>
+            <button id="sidebarClose" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <i class="fas fa-times theme-text-primary"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <nav class="p-4 space-y-2">
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="homeSection">
+                <i class="fas fa-home text-lg text-blue-600"></i>
+                <span class="theme-text-primary font-medium">Home</span>
+            </a>
+            
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="players">
+                <i class="fas fa-users text-lg text-blue-600"></i>
+                <span class="theme-text-primary font-medium">Players</span>
+            </a>
+            
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="managerSection">
+                <i class="fas fa-user-tie text-lg text-green-600"></i>
+                <span class="theme-text-primary font-medium">Manager</span>
+            </a>
+            
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="statisticsSection">
+                <i class="fas fa-chart-bar text-lg text-yellow-600"></i>
+                <span class="theme-text-primary font-medium">Statistics</span>
+            </a>
+            
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="chatSection">
+                <i class="fas fa-comments text-lg text-purple-600"></i>
+                <span class="theme-text-primary font-medium">Chat</span>
+            </a>
+            
+            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="aboutSection">
+                <i class="fas fa-info-circle text-lg text-indigo-600"></i>
+                <span class="theme-text-primary font-medium">About</span>
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 theme-border border-t">
+            <p class="text-xs theme-text-secondary text-center">
+                Blue's Book © 2024<br>
+                <span class="text-blue-600">KTBFFH 💙</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
