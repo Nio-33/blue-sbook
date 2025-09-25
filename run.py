@@ -22,10 +22,10 @@ if __name__ == '__main__':
     app = create_app()
     print("🔵 Blue's Book - Starting Flask Application")
     print("=" * 50)
-    print("🌐 Server: http://localhost:5000")
-    print("📚 API Docs: http://localhost:5000")
-    print("🔍 Health Check: http://localhost:5000/health")
+    print("🌐 Server: http://localhost:5001")
+    print("📚 API Docs: http://localhost:5001")
+    print("🔍 Health Check: http://localhost:5001/health")
     print("=" * 50)
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
 

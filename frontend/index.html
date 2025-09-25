@@ -61,7 +61,7 @@
         
         .header-clear {
             background: transparent;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: none;
         }
         
         
@@ -71,9 +71,35 @@
             transition: color 0.3s ease;
         }
         
+        /* Clickable header title styles */
+        .clickable-title {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .clickable-title:hover {
+            color: var(--chelsea-gold);
+            transform: translateY(-1px);
+        }
+        
+        .clickable-title:active {
+            transform: translateY(0);
+        }
+        
+        .clickable-title.active {
+            color: var(--chelsea-gold);
+        }
         
         [data-theme="dark"] .header-title {
             color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .clickable-title:hover {
+            color: var(--chelsea-light-blue);
+        }
+        
+        [data-theme="dark"] .clickable-title.active {
+            color: var(--chelsea-light-blue);
         }
         
         
@@ -329,209 +355,589 @@
             transition-timing-function: ease;
         }
         
-        /* Sidebar Styles */
-        #sidebar {
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        /* Header Navigation Styles */
+        .header-nav-link, .mobile-nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
-        
-        #sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .sidebar-nav-item {
+
+        .header-nav-link {
             position: relative;
             overflow: hidden;
         }
-        
-        .sidebar-nav-item:hover {
-            transform: translateX(5px);
-        }
-        
-        .sidebar-nav-item::before {
+
+        .header-nav-link::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(135deg, var(--chelsea-blue), var(--chelsea-light-blue));
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-            border-radius: 0 4px 4px 0;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--chelsea-gold), #F4C430);
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
         }
-        
-        .sidebar-nav-item:hover::before,
-        .sidebar-nav-item.active::before {
-            transform: scaleY(1);
+
+        .header-nav-link:hover::before,
+        .header-nav-link.active::before {
+            width: 80%;
         }
-        
-        .sidebar-nav-item.active {
+
+        .header-nav-link:hover {
+            color: var(--chelsea-gold);
+            transform: translateY(-1px);
+        }
+
+        .header-nav-link.active {
+            color: var(--chelsea-gold);
+            font-weight: 600;
+        }
+
+        .mobile-nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-link:hover {
             background: rgba(3, 70, 148, 0.1);
-            color: var(--chelsea-blue);
+            border-left-color: var(--chelsea-gold);
+            color: var(--chelsea-gold);
         }
-        
-        [data-theme="dark"] .sidebar-nav-item.active {
+
+        .mobile-nav-link.active {
+            background: rgba(3, 70, 148, 0.15);
+            border-left-color: var(--chelsea-gold);
+            color: var(--chelsea-gold);
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .mobile-nav-link:hover {
             background: rgba(108, 160, 220, 0.2);
         }
+
+        [data-theme="dark"] .mobile-nav-link.active {
+            background: rgba(108, 160, 220, 0.25);
+        }
         
-        /* Sidebar Toggle Button */
-        #sidebarToggle {
+        /* Responsive Header Navigation */
+        @media (max-width: 1024px) {
+            .header-nav-link {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .header-nav-link i {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 1.25rem;
+            }
+            
+            #mobileMenuToggle {
+                padding: 0.625rem;
+            }
+        }
+
+        /* Mobile Menu Toggle Animation */
+        #mobileMenuToggle {
+            transition: all 0.3s ease;
+        }
+
+        #mobileMenuToggle:hover {
+            transform: scale(1.05);
+        }
+
+        #mobileMenuToggle.open #mobileMenuIcon {
+            transform: rotate(90deg);
+        }
+
+        /* Mobile Navigation Animation */
+        #mobileNav {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        #mobileNav.show {
+            max-height: 400px;
+        }
+        
+        /* Hero Carousel Styles */
+        .hero-carousel {
+            animation: heroCarouselSlide 24s linear infinite;
+            width: 800%; /* 8 slides * 100% = 800% */
+        }
+        
+        .carousel-slide {
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        /* Pause animation on hover */
+        .hero-carousel:hover {
+            animation-play-state: paused;
+        }
+        
+        @keyframes heroCarouselSlide {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-75%); /* Move to show 6 unique slides (6/8 = 75%) */
+            }
+        }
+        
+        /* Responsive carousel adjustments */
+        @media (max-width: 768px) {
+            .hero-carousel {
+                animation-duration: 20s; /* Slightly faster on mobile */
+            }
+        }
+        
+        /* Ensure smooth performance */
+        .hero-carousel,
+        .carousel-slide {
+            will-change: transform;
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        /* 3D Hero Section Styles */
+        .hero-3d-section {
+            background: linear-gradient(135deg, #034694 0%, #011627 50%, #0A2A4A 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-3d-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(100, 160, 220, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Chelsea Highlight Color */
+        .chelsea-highlight {
+            color: #DBA111;
+            text-shadow: 0 0 20px rgba(219, 161, 17, 0.3);
+        }
+
+        /* Hero Title Animations */
+        .hero-title {
+            animation-delay: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        /* 3D Carousel Container - React Pattern */
+        .carousel-container {
+            width: 100%;
+            height: 480px;
+            position: relative;
+            margin: 4rem auto 0;
+            perspective: 5000px;
+            user-select: none;
+            touch-action: pan-x;
+        }
+
+        .rotating-carousel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.01s linear;
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .carousel-item {
+            position: absolute;
+            width: 250px;
+            height: 444px;
+            left: 50%;
+            top: 50%;
+            margin-left: -125px;
+            margin-top: -222px;
+            transition: all 0.01s linear;
+            cursor: grab;
+            will-change: transform;
+            transform-origin: center center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            
+            /* Eliminate harsh rectangular borders */
+            border-radius: 10px;
+            overflow: hidden;
+            
+            /* Very subtle edge softening */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        .carousel-item img,
+        .carousel-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            
+            /* Additional smoothing for media content */
+            filter: saturate(1.1) brightness(1.02);
             transition: all 0.3s ease;
         }
         
-        #sidebarToggle:hover {
-            transform: scale(1.1);
-            rotate: 90deg;
-        }
-        
-        /* Sidebar toggle visible on all screen sizes */
-        
-        /* Sidebar responsive behavior */
-        @media (max-width: 768px) {
-            #sidebar {
-                width: 280px;
-            }
-        }
-        
-        /* Main content shift when sidebar is open on desktop */
-        @media (min-width: 1024px) {
-            .main-content-shift {
-                margin-left: 256px;
-                transition: margin-left 0.3s ease;
-            }
-        }
-        
-        /* Sidebar overlay animation */
-        #sidebarOverlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
-        
-        #sidebarOverlay.show {
+        /* Enhanced hover effects for smooth interaction */
+        .carousel-item:hover {
             opacity: 1;
+            filter: blur(0px) brightness(1.08) contrast(1.05);
+            transform: scale(1.02);
+        }
+
+        /* Make carousel visible by default */
+        .carousel-container {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            animation-delay: 1.5s;
+            animation-fill-mode: forwards;
+        }
+
+        .cta-btn-primary,
+        .cta-btn-secondary {
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn-primary {
+            background: linear-gradient(135deg, #DBA111, #F4C430);
+            color: #034694;
+            border-color: #DBA111;
+        }
+
+        .cta-btn-primary:hover {
+            background: linear-gradient(135deg, #F4C430, #DBA111);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(219, 161, 17, 0.4);
+        }
+
+        .cta-btn-secondary {
+            background: transparent;
+            color: #DBA111;
+            border-color: #DBA111;
+        }
+
+        .cta-btn-secondary:hover {
+            background: #DBA111;
+            color: #034694;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(219, 161, 17, 0.3);
+        }
+
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Removed autoRotate3D - using individual item rotation instead */
+
+        .animate-fadeInUp {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Responsive Design for 3D Carousel - React Pattern */
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: 400px;
+                perspective: 2500px; /* Reduced for tablets */
+            }
+
+            .carousel-item {
+                width: 210px;
+                height: 373px;
+                margin-left: -105px;
+                margin-top: -186.5px;
+                
+                /* Subtle border softening for tablets */
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .hero-title h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-title p {
+                font-size: 1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .cta-btn-primary,
+            .cta-btn-secondary {
+                width: 250px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carousel-container {
+                height: 360px;
+                perspective: 2000px; /* Reduced for mobile */
+            }
+
+            .carousel-item {
+                width: 190px;
+                height: 337px;
+                margin-left: -95px;
+                margin-top: -168.5px;
+                
+                /* Subtle border softening for mobile */
+                border-radius: 6px;
+                overflow: hidden;
+            }
+
+            .hero-title h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Accessibility */
+        .carousel-item:focus {
+            outline: 3px solid #DBA111;
+            outline-offset: 3px;
+        }
+
+        /* Loading state */
+        .carousel-item img[data-loading="true"],
+        .carousel-item video[data-loading="true"] {
+            opacity: 0.5;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header/Navigation -->
-    <header class="header-clear shadow-md">
+    <header class="header-clear">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
+                <!-- Logo and Title -->
                 <div class="flex items-center space-x-2">
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1">
                         <img src="images/chelsea-logo-official.svg" alt="Chelsea FC Official Logo" class="w-full h-full object-contain">
                     </div>
-                    <h1 class="text-2xl font-bold header-title">Blue's Book</h1>
+                    <h1 class="text-2xl font-bold header-title nav-item clickable-title cursor-pointer transition-all duration-300 hover:opacity-80 active" data-section="homeSection">
+                        Blue's Book
+                    </h1>
                 </div>
                 
+                <!-- Horizontal Navigation Menu -->
+                <nav class="hidden md:flex items-center space-x-8" id="headerNavigation">
+                    <a href="#" class="nav-item header-nav-link" data-section="players">
+                        <i class="fas fa-users mr-2"></i>Players
+                    </a>
+                    <a href="#" class="nav-item header-nav-link" data-section="managerSection">
+                        <i class="fas fa-user-tie mr-2"></i>Manager
+                    </a>
+                    <a href="#" class="nav-item header-nav-link" data-section="statisticsSection">
+                        <i class="fas fa-chart-bar mr-2"></i>Statistics
+                    </a>
+                    <a href="#" class="nav-item header-nav-link" data-section="chatSection">
+                        <i class="fas fa-comments mr-2"></i>Chat
+                    </a>
+                    <a href="#" class="nav-item header-nav-link" data-section="aboutSection">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a>
+                </nav>
                 
-                <div class="flex items-center">
+                <!-- Mobile Menu Button & Theme Toggle -->
+                <div class="flex items-center space-x-2">
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuToggle" class="md:hidden theme-card theme-text-primary p-2 rounded-lg transition-all duration-300 hover:opacity-80">
+                        <i class="fas fa-bars text-lg" id="mobileMenuIcon"></i>
+                    </button>
+                    
                     <!-- Theme Toggle Button -->
                     <button id="themeToggle" class="theme-card theme-text-primary p-2 rounded-lg transition-all duration-300 hover:opacity-80" title="Toggle Theme">
                         <i class="fas fa-moon text-lg" id="themeIcon"></i>
                     </button>
                 </div>
             </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <nav id="mobileNav" class="md:hidden mt-4 hidden">
+                <div class="flex flex-col space-y-2 py-4">
+                    <a href="#" class="nav-item mobile-nav-link" data-section="players">
+                        <i class="fas fa-users mr-3"></i>Players
+                    </a>
+                    <a href="#" class="nav-item mobile-nav-link" data-section="managerSection">
+                        <i class="fas fa-user-tie mr-3"></i>Manager
+                    </a>
+                    <a href="#" class="nav-item mobile-nav-link" data-section="statisticsSection">
+                        <i class="fas fa-chart-bar mr-3"></i>Statistics
+                    </a>
+                    <a href="#" class="nav-item mobile-nav-link" data-section="chatSection">
+                        <i class="fas fa-comments mr-3"></i>Chat
+                    </a>
+                    <a href="#" class="nav-item mobile-nav-link" data-section="aboutSection">
+                        <i class="fas fa-info-circle mr-3"></i>About
+                    </a>
+                </div>
+            </nav>
         </div>
     </header>
 
-    <!-- Sidebar Toggle Button -->
-    <button id="sidebarToggle" class="fixed top-20 left-4 z-50 p-3 theme-card rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-        <i class="fas fa-bars text-xl theme-text-primary"></i>
-    </button>
-
-    <!-- Sidebar -->
-    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 theme-card shadow-xl transform -translate-x-full transition-transform duration-300 ease-in-out z-40">
-        <!-- Sidebar Header -->
-        <div class="flex items-center justify-between p-6 theme-border border-b">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1">
-                    <img src="images/chelsea-logo-official.svg" alt="Chelsea FC" class="w-full h-full object-contain">
+    <!-- Landing Page Section - Full Width Hero -->
+    <section id="homeSection">
+        <!-- 3D Hero Section -->
+        <div class="hero-3d-section flex flex-col justify-center items-center text-center py-8">
+            <!-- Title and Subtitle -->
+            <div class="hero-title mb-12">
+                <div class="flex justify-center mb-6">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center p-2 shadow-xl">
+                        <img src="images/chelsea-logo-official.svg" alt="Chelsea FC Official Logo" class="w-full h-full object-contain">
+                    </div>
                 </div>
-                <h2 class="text-xl font-bold theme-text-primary">Blue's Book</h2>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                    Where <span class="chelsea-highlight font-extrabold">Blue Meets Excellence</span>
+                </h1>
+                <p class="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto">
+                    25+ Current Players • From Legends to Rising Stars • Complete Squad Analytics
+                </p>
             </div>
-            <button id="sidebarClose" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <i class="fas fa-times theme-text-primary"></i>
-            </button>
-        </div>
 
-        <!-- Sidebar Navigation -->
-        <nav class="p-4 space-y-2">
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="homeSection">
-                <i class="fas fa-home text-lg text-blue-600"></i>
-                <span class="theme-text-primary font-medium">Home</span>
-            </a>
-            
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="players">
-                <i class="fas fa-users text-lg text-blue-600"></i>
-                <span class="theme-text-primary font-medium">Players</span>
-            </a>
-            
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="managerSection">
-                <i class="fas fa-user-tie text-lg text-green-600"></i>
-                <span class="theme-text-primary font-medium">Manager</span>
-            </a>
-            
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="statisticsSection">
-                <i class="fas fa-chart-bar text-lg text-yellow-600"></i>
-                <span class="theme-text-primary font-medium">Statistics</span>
-            </a>
-            
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="chatSection">
-                <i class="fas fa-comments text-lg text-purple-600"></i>
-                <span class="theme-text-primary font-medium">Chat</span>
-            </a>
-            
-            <a href="#" class="nav-item sidebar-nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" data-section="aboutSection">
-                <i class="fas fa-info-circle text-lg text-indigo-600"></i>
-                <span class="theme-text-primary font-medium">About</span>
-            </a>
-        </nav>
 
-        <!-- Sidebar Footer -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 theme-border border-t">
-            <p class="text-xs theme-text-secondary text-center">
-                Blue's Book © 2024<br>
-                <span class="text-blue-600">KTBFFH 💙</span>
-            </p>
-        </div>
-    </div>
+            <!-- 3D Rotating Carousel - React Pattern -->
+            <div class="carousel-container" id="carouselContainer">
+                <div class="rotating-carousel" id="rotatingCarousel">
+                    <!-- Chelsea Player Images -->
+                    <div class="carousel-item" data-player="1" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop&crop=face" 
+                             alt="Cole Palmer" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="2" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=300&h=400&fit=crop&crop=face" 
+                             alt="Nicolas Jackson" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="3" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" 
+                             alt="Enzo Fernández" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="4" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face" 
+                             alt="Moisés Caicedo" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="5" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face" 
+                             alt="Thiago Silva" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="6" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1507592192555-89eb4fa8a73f?w=300&h=400&fit=crop&crop=face" 
+                             alt="Robert Sánchez" loading="lazy">
+                    </div>
+                    
+                    <div class="carousel-item" data-player="7" data-type="player">
+                        <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=300&h=400&fit=crop&crop=face" 
+                             alt="Reece James" loading="lazy">
+                    </div>
 
-    <!-- Sidebar Overlay -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
-
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- Landing Page Section -->
-        <section id="homeSection">
-            <!-- Hero Section -->
-            <div class="mb-16 text-center">
-                <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 rounded-2xl shadow-2xl overflow-hidden mb-12">
-                    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                    <div class="relative px-8 py-16 md:py-24">
-                        <div class="flex justify-center mb-6">
-                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center p-3 shadow-lg">
-                                <img src="images/chelsea-logo-official.svg" alt="Chelsea FC Official Logo" class="w-full h-full object-contain">
-                            </div>
-                        </div>
-                        <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">Blue's Book</h1>
-                        <p class="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto mb-8">
-                            The definitive digital reference for comprehensive, real-time information about current Chelsea FC players, management, and club history.
-                        </p>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <button class="nav-trigger bg-white text-blue-800 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition shadow-lg" data-section="players">
-                                <i class="fas fa-users mr-2"></i>Explore Squad
-                            </button>
-                            <button class="nav-trigger bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg border-2 border-blue-600" data-section="chatSection">
-                                <i class="fas fa-comments mr-2"></i>Ask Chelsea AI
-                            </button>
-                        </div>
+                    <!-- Chelsea Videos -->
+                    <div class="carousel-item" data-type="video">
+                        <video autoplay loop muted playsinline>
+                            <source src="https://cdn.coverr.co/videos/coverr-football-player-kicking-ball-2165/1080p.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    
+                    <div class="carousel-item" data-type="video">
+                        <video autoplay loop muted playsinline>
+                            <source src="https://cdn.coverr.co/videos/coverr-soccer-ball-on-grass-4582/1080p.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    
+                    <div class="carousel-item" data-type="video">
+                        <video autoplay loop muted playsinline>
+                            <source src="https://cdn.coverr.co/videos/coverr-football-fans-cheering-2573/1080p.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    
+                    <div class="carousel-item" data-type="video">
+                        <video autoplay loop muted playsinline>
+                            <source src="https://cdn.coverr.co/videos/coverr-soccer-goal-celebration-2167/1080p.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    
+                    <div class="carousel-item" data-type="video">
+                        <video autoplay loop muted playsinline>
+                            <source src="https://cdn.coverr.co/videos/coverr-trophy-presentation-ceremony-4821/1080p.mp4" type="video/mp4">
+                        </video>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Access Cards -->
+            <!-- Call-to-Action Buttons -->
+            <div class="cta-buttons flex flex-wrap justify-center gap-6 mt-12">
+                <button class="nav-trigger cta-btn-primary" data-section="players">
+                    <i class="fas fa-users mr-2"></i>Explore Full Squad
+                </button>
+                <button class="nav-trigger cta-btn-secondary" data-section="chatSection">
+                    <i class="fas fa-comments mr-2"></i>Chat with Chelsea AI
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Access Cards (Homepage Only) -->
+        <section class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                 <div class="nav-trigger theme-card rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:transform hover:scale-105" data-section="players">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -647,6 +1053,12 @@
                 </div>
             </div>
         </section>
+
+    </section>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+
 
         <!-- Original Hero Section (for other pages) -->
         <section class="mb-12 text-center hidden" id="originalHero">
@@ -1277,9 +1689,366 @@
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script src="js/app.js"></script>
-    <script src="js/search.js"></script>
-    <script src="js/player.js"></script>
+    <!-- JavaScript with cache busting -->
+    <script src="js/app.js?v=2025092506"></script>
+    <script src="js/search.js?v=2025092506"></script>
+    <script src="js/player.js?v=2025092506"></script>
+
+    <!-- 3D Carousel JavaScript -->
+    <script>
+        class Chelsea3DCarousel {
+            constructor() {
+                console.log('🎠 Initializing Chelsea 3D Carousel...');
+                this.carouselContainer = document.getElementById('carouselContainer');
+                this.rotatingCarousel = document.getElementById('rotatingCarousel');
+                
+                if (!this.carouselContainer) {
+                    console.error('❌ carouselContainer not found!');
+                    return;
+                }
+                if (!this.rotatingCarousel) {
+                    console.error('❌ rotatingCarousel not found!');
+                    return;
+                }
+                
+                console.log('✅ DOM elements found successfully');
+                
+                this.isDragging = false;
+                this.startX = 0;
+                this.rotationDegrees = 0;
+                this.rotationSpeed = 0.002; // 0.002 degrees per millisecond
+                this.animationFrameRef = null;
+                this.lastTimeRef = 0;
+                this.items = [];
+                this.radius = 1000; // Fixed 1000px radius
+                
+                this.init();
+            }
+
+            init() {
+                this.initializeItems();
+                this.setupEventListeners();
+                this.positionItems();
+                this.startAutoRotation();
+                this.setupLazyLoading();
+                this.setupVideoHandling();
+                this.showCarousel();
+            }
+
+            initializeItems() {
+                this.items = Array.from(this.rotatingCarousel.querySelectorAll('.carousel-item'));
+                console.log(`🔍 Found ${this.items.length} carousel items`);
+                
+                if (this.items.length === 0) {
+                    console.error('❌ No carousel items found! Check HTML structure.');
+                    return;
+                }
+                
+                // Log each item for debugging
+                this.items.forEach((item, index) => {
+                    console.log(`📄 Item ${index}: ${item.dataset.player ? 'Player' : 'Video'} - ${item.alt || 'Video content'}`);
+                });
+            }
+
+            positionItems() {
+                console.log('🎯 Positioning carousel items...');
+                if (this.items.length === 0) {
+                    console.error('❌ No items to position!');
+                    return;
+                }
+                
+                this.items.forEach((item, index) => {
+                    const angle = (index * 360) / this.items.length;
+                    const transform = `rotateY(${angle}deg) translateZ(${this.radius}px)`;
+                    
+                    item.style.transform = transform;
+                    item.style.backfaceVisibility = 'hidden';
+                    item.style.position = 'absolute';
+                    item.style.transformOrigin = 'center center';
+                    
+                    console.log(`📐 Item ${index}: angle=${angle.toFixed(1)}°, transform="${transform}"`);
+                });
+                
+                console.log(`✅ Positioned ${this.items.length} items in 3D circle`);
+            }
+
+            showCarousel() {
+                // Make carousel visible with fade-in
+                setTimeout(() => {
+                    this.carouselContainer.style.opacity = '1';
+                    this.carouselContainer.style.transform = 'scale(1)';
+                }, 100);
+            }
+
+            startAutoRotation() {
+                console.log('🔄 Starting auto-rotation...');
+                if (this.items.length === 0) {
+                    console.error('❌ Cannot start rotation: no items found');
+                    return;
+                }
+                if (this.isDragging) {
+                    console.log('⏸️ Skipping rotation: user is dragging');
+                    return;
+                }
+
+                const animate = (time) => {
+                    if (this.lastTimeRef === 0) {
+                        this.lastTimeRef = time;
+                    }
+                    
+                    const deltaTime = time - this.lastTimeRef;
+                    this.lastTimeRef = time;
+                    
+                    const rotationDelta = this.rotationSpeed * deltaTime;
+                    this.rotationDegrees += rotationDelta;
+                    
+                    // Apply rotation to the entire carousel container
+                    this.rotatingCarousel.style.transform = `rotateY(${this.rotationDegrees}deg)`;
+                    
+                    if (!this.isDragging) {
+                        this.animationFrameRef = requestAnimationFrame(animate);
+                    }
+                };
+                
+                this.animationFrameRef = requestAnimationFrame(animate);
+                console.log('✅ Auto-rotation started successfully');
+            }
+
+            stopAutoRotation() {
+                if (this.animationFrameRef) {
+                    cancelAnimationFrame(this.animationFrameRef);
+                    this.animationFrameRef = null;
+                }
+            }
+
+            setupEventListeners() {
+                // Mouse events
+                this.rotatingCarousel.addEventListener('mousedown', this.handleDragStart.bind(this));
+                document.addEventListener('mousemove', this.handleDragMove.bind(this));
+                document.addEventListener('mouseup', this.handleDragEnd.bind(this));
+                document.addEventListener('mouseleave', this.handleDragEnd.bind(this));
+
+                // Touch events
+                this.rotatingCarousel.addEventListener('touchstart', this.handleDragStart.bind(this), { passive: false });
+                document.addEventListener('touchmove', this.handleDragMove.bind(this), { passive: false });
+                document.addEventListener('touchend', this.handleDragEnd.bind(this));
+
+                // Prevent context menu
+                this.rotatingCarousel.addEventListener('contextmenu', (e) => e.preventDefault());
+
+                // Window resize for responsive handling
+                window.addEventListener('resize', this.handleResize.bind(this));
+
+            }
+
+            handleDragStart(e) {
+                this.isDragging = true;
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                this.startX = clientX;
+                
+                this.stopAutoRotation();
+                this.rotatingCarousel.style.cursor = 'grabbing';
+            }
+
+            handleDragMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault();
+                
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const diff = clientX - this.startX;
+                
+                // Update rotation based on drag
+                this.rotationDegrees += (diff * 0.2);
+                this.rotatingCarousel.style.transform = `rotateY(${this.rotationDegrees}deg)`;
+                this.startX = clientX;
+            }
+
+            handleDragEnd() {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                this.lastTimeRef = 0; // Reset for smooth animation restart
+                this.rotatingCarousel.style.cursor = 'grab';
+                
+                // Restart auto-rotation after a short delay
+                setTimeout(() => {
+                    if (!this.isDragging) {
+                        this.startAutoRotation();
+                    }
+                }, 1000);
+            }
+
+            handleResize() {
+                // Update positioning on window resize
+                this.positionItems();
+            }
+
+            setupLazyLoading() {
+                const images = this.rotatingCarousel.querySelectorAll('img[loading="lazy"]');
+                
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                img.setAttribute('data-loading', 'true');
+                                
+                                img.onload = () => {
+                                    img.removeAttribute('data-loading');
+                                    imageObserver.unobserve(img);
+                                };
+                                
+                                img.onerror = () => {
+                                    img.removeAttribute('data-loading');
+                                };
+                            }
+                        });
+                    });
+
+                    images.forEach(img => imageObserver.observe(img));
+                }
+            }
+
+            setupVideoHandling() {
+                const videos = this.rotatingCarousel.querySelectorAll('video');
+                videos.forEach(video => {
+                    video.setAttribute('data-loading', 'true');
+                    
+                    video.addEventListener('loadeddata', () => {
+                        video.removeAttribute('data-loading');
+                    });
+                    
+                    video.addEventListener('error', () => {
+                        video.removeAttribute('data-loading');
+                        console.warn('Failed to load video:', video.src);
+                    });
+
+                    video.addEventListener('canplay', () => {
+                        video.play().catch(e => {
+                            console.log('Video autoplay prevented:', e.message);
+                        });
+                    });
+
+                    if (video.readyState >= 3) {
+                        video.removeAttribute('data-loading');
+                    }
+                });
+            }
+        }
+
+
+        // Multiple initialization strategies to ensure carousel loads
+        
+        // Strategy 1: Window fully loaded
+        window.addEventListener('load', () => {
+            console.log('🌍 Window FULLY loaded - Attempting carousel initialization...');
+            initializeCarouselWithRetry(1);
+        });
+        
+        // Strategy 2: DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM Content Loaded - Attempting carousel initialization...');
+            setTimeout(() => initializeCarouselWithRetry(2), 1500);
+        });
+        
+        // Strategy 3: Backup initialization after 3 seconds
+        setTimeout(() => {
+            console.log('⏰ Backup timer - Attempting carousel initialization...');
+            initializeCarouselWithRetry(3);
+        }, 3000);
+        
+        // Robust initialization function with retry logic
+        function initializeCarouselWithRetry(strategy) {
+            console.log(`🔄 STRATEGY ${strategy}: Starting carousel initialization...`);
+            
+            // Check if already initialized
+            if (window.chelsea3DCarousel) {
+                console.log('✅ Carousel already initialized, skipping...');
+                return;
+            }
+            
+            // Verify DOM elements exist
+            const container = document.getElementById('carouselContainer');
+            const rotating = document.getElementById('rotatingCarousel');
+            const items = document.querySelectorAll('.carousel-item');
+            
+            console.log(`🔍 DOM Check - Container: ${!!container}, Rotating: ${!!rotating}, Items: ${items.length}`);
+            
+            if (!container || !rotating || items.length === 0) {
+                console.error('❌ DOM elements not ready, will retry in 1 second...');
+                setTimeout(() => initializeCarouselWithRetry(strategy), 1000);
+                return;
+            }
+            
+            try {
+                console.log('🎯 All DOM elements found, initializing carousel...');
+                window.chelsea3DCarousel = new Chelsea3DCarousel();
+                
+                if (window.chelsea3DCarousel) {
+                    console.log('🎉 Chelsea 3D Carousel initialized successfully!');
+                    
+                    // Update debug indicator
+                    const debugEl = document.getElementById('debugIndicator');
+                    if (debugEl) {
+                        debugEl.style.background = '#0066cc';
+                        debugEl.style.color = '#fff';
+                        debugEl.textContent = '🎠 CAROUSEL ACTIVE!';
+                    }
+                    
+                    // Integrate with main app if available
+                    if (window.app) {
+                        window.app.carousel3D = window.chelsea3DCarousel;
+                        console.log('🔗 3D Carousel integrated with main app');
+                    } else {
+                        console.log('⚠️ Main app not found, but carousel initialized independently');
+                    }
+                } else {
+                    console.error('❌ Carousel object is null after initialization');
+                }
+            } catch (error) {
+                console.error('💥 Failed to initialize Chelsea 3D Carousel:', error);
+                console.error('Stack trace:', error.stack);
+                
+                // Update debug indicator to show error
+                const debugEl = document.getElementById('debugIndicator');
+                if (debugEl) {
+                    debugEl.style.background = '#ff0000';
+                    debugEl.style.color = '#fff';
+                    debugEl.textContent = '❌ CAROUSEL ERROR!';
+                }
+            }
+        }
+
+        // Handle smooth scrolling for CTA buttons (enhance existing functionality)
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctaButtons = document.querySelectorAll('.cta-btn-primary, .cta-btn-secondary');
+            ctaButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // The existing nav-trigger functionality will handle this
+                    // Add some visual feedback
+                    this.style.transform = 'translateY(-2px) scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', () => {
+            if ('performance' in window) {
+                const loadTime = performance.now();
+                console.log('3D Carousel page load time:', loadTime.toFixed(2), 'ms');
+                
+                // Log any performance issues
+                if (loadTime > 3000) {
+                    console.warn('Page load time is high. Consider optimizing media assets.');
+                }
+            }
+        });
+
+        // Export for potential external use
+        window.Chelsea3DCarousel = Chelsea3DCarousel;
+    </script>
 </body>
 </html>

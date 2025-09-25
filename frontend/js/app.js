@@ -5,7 +5,7 @@
 
 class BluesBookApp {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:5000/api/v1';
+        this.apiBaseUrl = 'http://localhost:5001/api/v1';
         this.players = [];
         this.currentPlayer = null;
         this.featuredPlayer = null;
@@ -128,8 +128,11 @@ class BluesBookApp {
         // Theme functionality
         this.setupThemeEventListener();
         
-        // Sidebar functionality
-        this.setupSidebarEventListeners();
+        // Mobile menu toggle functionality
+        this.setupMobileMenuEventListeners();
+        
+        // Hero carousel functionality
+        this.setupHeroCarousel();
         
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
@@ -721,13 +724,23 @@ class BluesBookApp {
     
     handleNavigation(event) {
         event.preventDefault();
-        const section = event.target.dataset.section;
+        const section = event.target.dataset.section || event.currentTarget.dataset.section;
         
-        // Update navigation active states
-        document.querySelectorAll('.nav-item').forEach(item => {
+        // Close mobile menu if open
+        if (this.isMobileMenuOpen()) {
+            this.closeMobileMenu();
+        }
+        
+        // Update navigation active states for both desktop and mobile
+        document.querySelectorAll('.nav-item, .header-nav-link, .mobile-nav-link').forEach(item => {
             item.classList.remove('active');
         });
-        event.target.classList.add('active');
+        
+        // Add active class to all corresponding nav items (desktop and mobile)
+        const targetNavItems = document.querySelectorAll(`[data-section="${section}"]`);
+        targetNavItems.forEach(item => {
+            item.classList.add('active');
+        });
         
         // Hide all main sections
         const sections = ['playersSection', 'managerSection', 'statisticsSection', 'chatSection', 'aboutSection'];
@@ -737,6 +750,14 @@ class BluesBookApp {
                 element.classList.add('hidden');
             }
         });
+        
+        // Always hide homeSection when navigating to other pages (hero should only be on homepage)
+        if (section !== 'homeSection') {
+            const homeSection = document.getElementById('homeSection');
+            if (homeSection) {
+                homeSection.classList.add('hidden');
+            }
+        }
         
         // Hide/show player-specific sections based on navigation
         const playerSpecificSections = ['searchSection', 'filtersSection', 'featuredSection'];
@@ -795,6 +816,14 @@ class BluesBookApp {
                 element.classList.add('hidden');
             }
         });
+        
+        // Always hide homeSection when showing other sections (hero should only be on homepage)
+        if (sectionId !== 'homeSection') {
+            const homeSection = document.getElementById('homeSection');
+            if (homeSection) {
+                homeSection.classList.add('hidden');
+            }
+        }
         
         // Show the requested section
         const section = document.getElementById(sectionId);
@@ -1785,126 +1814,158 @@ class BluesBookApp {
         }
     }
     
-    // Sidebar management methods
-    setupSidebarEventListeners() {
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item');
+    // Mobile menu management methods
+    setupMobileMenuEventListeners() {
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileNav = document.getElementById('mobileNav');
         
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', this.toggleSidebar.bind(this));
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', this.toggleMobileMenu.bind(this));
         }
         
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', this.closeSidebar.bind(this));
-        }
-        
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', this.closeSidebar.bind(this));
-        }
-        
-        // Add click handlers for sidebar navigation items
-        sidebarNavItems.forEach(item => {
+        // Handle mobile nav items
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-link');
+        mobileNavItems.forEach(item => {
             item.addEventListener('click', (e) => {
-                this.handleSidebarNavigation(e);
+                this.handleNavigation(e);
+                // Close mobile menu after navigation
+                this.closeMobileMenu();
             });
         });
         
-        // Close sidebar on Escape key
+        // Close mobile menu on outside click
+        document.addEventListener('click', (e) => {
+            if (this.isMobileMenuOpen() && 
+                !e.target.closest('#mobileNav') && 
+                !e.target.closest('#mobileMenuToggle')) {
+                this.closeMobileMenu();
+            }
+        });
+        
+        // Close mobile menu on Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isSidebarOpen()) {
-                this.closeSidebar();
+            if (e.key === 'Escape' && this.isMobileMenuOpen()) {
+                this.closeMobileMenu();
             }
         });
     }
     
-    toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            if (this.isSidebarOpen()) {
-                this.closeSidebar();
+    toggleMobileMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        if (mobileNav) {
+            if (this.isMobileMenuOpen()) {
+                this.closeMobileMenu();
             } else {
-                this.openSidebar();
+                this.openMobileMenu();
             }
         }
     }
     
-    openSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const mainContent = document.querySelector('main');
+    openMobileMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        const menuIcon = document.getElementById('mobileMenuIcon');
         
-        if (sidebar) {
-            sidebar.classList.add('open');
+        if (mobileNav) {
+            mobileNav.classList.remove('hidden');
+            mobileNav.classList.add('show');
         }
         
-        if (overlay) {
-            overlay.classList.remove('hidden');
-            overlay.classList.add('show');
-        }
-        
-        // Add shift to main content on desktop
-        if (window.innerWidth >= 1024 && mainContent) {
-            mainContent.classList.add('main-content-shift');
-        }
-        
-        // Prevent body scroll when sidebar is open on mobile
-        if (window.innerWidth < 1024) {
-            document.body.style.overflow = 'hidden';
+        if (menuIcon) {
+            menuIcon.classList.replace('fa-bars', 'fa-times');
         }
     }
     
-    closeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const mainContent = document.querySelector('main');
+    closeMobileMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        const menuIcon = document.getElementById('mobileMenuIcon');
         
-        if (sidebar) {
-            sidebar.classList.remove('open');
+        if (mobileNav) {
+            mobileNav.classList.remove('show');
+            // Use timeout to allow animation to complete before hiding
+            setTimeout(() => {
+                if (!mobileNav.classList.contains('show')) {
+                    mobileNav.classList.add('hidden');
+                }
+            }, 300);
         }
         
-        if (overlay) {
-            overlay.classList.remove('show');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
+        if (menuIcon) {
+            menuIcon.classList.replace('fa-times', 'fa-bars');
         }
-        
-        // Remove shift from main content
-        if (mainContent) {
-            mainContent.classList.remove('main-content-shift');
-        }
-        
-        // Restore body scroll
-        document.body.style.overflow = '';
     }
     
-    isSidebarOpen() {
-        const sidebar = document.getElementById('sidebar');
-        return sidebar && sidebar.classList.contains('open');
+    isMobileMenuOpen() {
+        const mobileNav = document.getElementById('mobileNav');
+        return mobileNav && mobileNav.classList.contains('show');
     }
     
-    handleSidebarNavigation(event) {
-        event.preventDefault();
+    // Hero Carousel management methods
+    setupHeroCarousel() {
+        const carousel = document.getElementById('heroCarousel');
+        if (!carousel) return;
         
-        // Get the target section from the clicked item
-        const section = event.currentTarget.getAttribute('data-section');
-        
-        if (section) {
-            // Update active states in sidebar
-            const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item');
-            sidebarNavItems.forEach(item => {
-                item.classList.remove('active');
+        // Add intersection observer to pause/resume animation when hero is not visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    carousel.style.animationPlayState = 'running';
+                } else {
+                    carousel.style.animationPlayState = 'paused';
+                }
             });
-            event.currentTarget.classList.add('active');
-            
-            // Close sidebar on mobile after navigation
-            if (window.innerWidth < 1024) {
-                this.closeSidebar();
+        }, { threshold: 0.1 });
+        
+        observer.observe(carousel.parentElement);
+        
+        // Add touch/mouse interaction for pause on hover/touch
+        this.setupCarouselInteractions(carousel);
+        
+        // Preload images for better performance
+        this.preloadCarouselImages();
+    }
+    
+    setupCarouselInteractions(carousel) {
+        let isPaused = false;
+        
+        // Mouse interactions
+        carousel.addEventListener('mouseenter', () => {
+            carousel.style.animationPlayState = 'paused';
+            isPaused = true;
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+            if (isPaused) {
+                carousel.style.animationPlayState = 'running';
+                isPaused = false;
             }
-            
-            // Handle the navigation using the existing navigation system
-            this.handleNavigation({ target: event.currentTarget });
-        }
+        });
+        
+        // Touch interactions for mobile
+        carousel.addEventListener('touchstart', () => {
+            carousel.style.animationPlayState = 'paused';
+            isPaused = true;
+        });
+        
+        carousel.addEventListener('touchend', () => {
+            setTimeout(() => {
+                if (isPaused) {
+                    carousel.style.animationPlayState = 'running';
+                    isPaused = false;
+                }
+            }, 1000); // Resume after 1 second
+        });
+    }
+    
+    preloadCarouselImages() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        slides.forEach(slide => {
+            const bgImage = slide.style.backgroundImage;
+            if (bgImage) {
+                const imageUrl = bgImage.slice(5, -2); // Remove 'url("' and '")'
+                const img = new Image();
+                img.src = imageUrl;
+            }
+        });
     }
     
     showThemeChangeNotification(theme) {
