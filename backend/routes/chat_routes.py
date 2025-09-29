@@ -7,16 +7,26 @@ from flask import Blueprint, jsonify, request
 import sys
 import os
 import time
+import logging
 from typing import List, Dict
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add services directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'services'))
-from gemini_service import GeminiService
 
 chat_bp = Blueprint('chat', __name__)
 
-# Initialize Gemini service
-gemini_service = GeminiService()
+def get_gemini_service():
+    """Get GeminiService instance with error handling"""
+    try:
+        from gemini_service import GeminiService
+        return GeminiService()
+    except Exception as e:
+        logger.error(f"Failed to initialize GeminiService: {str(e)}")
+        return None
 
 @chat_bp.route('/send', methods=['POST'])
 def send_message():
@@ -47,6 +57,15 @@ def send_message():
         # Get chat history if provided
         chat_history = data.get('history', [])
         
+        # Initialize Gemini service
+        gemini_service = get_gemini_service()
+        if not gemini_service:
+            return jsonify({
+                'success': False,
+                'error': 'AI service initialization failed',
+                'message': "I'm sorry, but the AI chat service is not currently available. Please check the server configuration."
+            }), 503
+        
         start_time = time.time()
         
         # Generate AI response
@@ -75,6 +94,14 @@ def send_message():
 def get_suggestions():
     """Get suggested questions for Chelsea FC chat"""
     try:
+        # Initialize Gemini service
+        gemini_service = get_gemini_service()
+        if not gemini_service:
+            return jsonify({
+                'success': False,
+                'error': 'AI service not available'
+            }), 503
+            
         suggestions = gemini_service.get_suggested_questions()
         
         return jsonify({
@@ -93,6 +120,16 @@ def get_suggestions():
 def chat_health():
     """Check if chat service is healthy"""
     try:
+        # Initialize Gemini service
+        gemini_service = get_gemini_service()
+        if not gemini_service:
+            return jsonify({
+                'success': True,
+                'healthy': False,
+                'service': 'Gemini AI Chat',
+                'status': 'service_initialization_failed'
+            })
+            
         # Validate API key and service
         is_healthy = gemini_service.validate_api_key()
         
@@ -114,6 +151,21 @@ def chat_health():
 def get_chat_context():
     """Get information about what the chat can help with"""
     try:
+        # Initialize Gemini service
+        gemini_service = get_gemini_service()
+        sample_questions = []
+        if gemini_service:
+            try:
+                sample_questions = gemini_service.get_suggested_questions()[:5]
+            except:
+                sample_questions = [
+                    "When was Chelsea FC founded?",
+                    "Tell me about Chelsea's Champions League victories",
+                    "Who are Chelsea's greatest managers?",
+                    "What trophies has Chelsea won?",
+                    "Tell me about Stamford Bridge stadium"
+                ]
+        
         context_info = {
             'name': 'Chelsea FC History Assistant',
             'description': 'Ask me anything about Chelsea Football Club history, players, managers, trophies, and facts!',
@@ -125,7 +177,7 @@ def get_chat_context():
                 'Stadium and facilities information',
                 'Club records and milestones'
             ],
-            'sample_questions': gemini_service.get_suggested_questions()[:5]
+            'sample_questions': sample_questions
         }
         
         return jsonify({

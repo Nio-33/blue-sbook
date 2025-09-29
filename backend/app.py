@@ -12,11 +12,40 @@ from dotenv import load_dotenv
 # Load environment variables from project root
 load_dotenv(dotenv_path=Path(__file__).parent.parent / '.env')
 
-# Import routes
-from routes.player_routes import player_bp
-from routes.manager_routes import manager_bp
-from routes.search_routes import search_bp
-from routes.chat_routes import chat_bp
+# Import routes with error handling
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+try:
+    from routes.player_routes import player_bp
+    logger.info("✅ Successfully imported player_routes")
+except Exception as e:
+    logger.error(f"❌ Failed to import player_routes: {str(e)}")
+    player_bp = None
+
+try:
+    from routes.manager_routes import manager_bp
+    logger.info("✅ Successfully imported manager_routes")
+except Exception as e:
+    logger.error(f"❌ Failed to import manager_routes: {str(e)}")
+    manager_bp = None
+
+try:
+    from routes.search_routes import search_bp
+    logger.info("✅ Successfully imported search_routes")
+except Exception as e:
+    logger.error(f"❌ Failed to import search_routes: {str(e)}")
+    search_bp = None
+
+try:
+    from routes.chat_routes import chat_bp
+    logger.info("✅ Successfully imported chat_routes")
+except Exception as e:
+    logger.error(f"❌ Failed to import chat_routes: {str(e)}")
+    logger.error(f"Error details: {repr(e)}")
+    chat_bp = None
 
 def create_app():
     """Create and configure the Flask application"""
@@ -51,11 +80,38 @@ def create_app():
     # Enable CORS for frontend
     CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:5000', 'http://localhost:5000'])
     
-    # Register blueprints
-    app.register_blueprint(player_bp, url_prefix='/api/v1/players')
-    app.register_blueprint(manager_bp, url_prefix='/api/v1/managers')
-    app.register_blueprint(search_bp, url_prefix='/api/v1/search')
-    app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
+    # Register blueprints with error handling
+    blueprints_registered = []
+    
+    if player_bp:
+        app.register_blueprint(player_bp, url_prefix='/api/v1/players')
+        blueprints_registered.append('players')
+        logger.info("✅ Registered player routes")
+    else:
+        logger.error("❌ Skipped player routes (import failed)")
+    
+    if manager_bp:
+        app.register_blueprint(manager_bp, url_prefix='/api/v1/managers')
+        blueprints_registered.append('managers')
+        logger.info("✅ Registered manager routes")
+    else:
+        logger.error("❌ Skipped manager routes (import failed)")
+    
+    if search_bp:
+        app.register_blueprint(search_bp, url_prefix='/api/v1/search')
+        blueprints_registered.append('search')
+        logger.info("✅ Registered search routes")
+    else:
+        logger.error("❌ Skipped search routes (import failed)")
+    
+    if chat_bp:
+        app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
+        blueprints_registered.append('chat')
+        logger.info("✅ Registered chat routes")
+    else:
+        logger.error("❌ Skipped chat routes (import failed)")
+    
+    logger.info(f"📋 Total blueprints registered: {len(blueprints_registered)} - {blueprints_registered}")
     
     # Health check endpoint
     @app.route('/health')
@@ -120,6 +176,31 @@ def create_app():
             
         return jsonify(debug_info)
     
+    # Debug endpoint to list all registered routes
+    @app.route('/debug/routes')
+    def debug_routes():
+        """Debug endpoint to list all registered routes"""
+        if app.config['FLASK_ENV'] != 'development':
+            return jsonify({'error': 'Debug endpoint only available in development'}), 403
+        
+        routes = []
+        for rule in app.url_map.iter_rules():
+            routes.append({
+                'endpoint': rule.endpoint,
+                'methods': list(rule.methods - {'HEAD', 'OPTIONS'}),  # Remove automatic methods
+                'rule': str(rule)
+            })
+        
+        # Filter for chat routes specifically
+        chat_routes = [r for r in routes if '/chat' in r['rule']]
+        
+        return jsonify({
+            'total_routes': len(routes),
+            'chat_routes': chat_routes,
+            'chat_routes_count': len(chat_routes),
+            'all_routes': sorted(routes, key=lambda x: x['rule'])
+        })
+    
     # Serve the main frontend application
     @app.route('/')
     def index():
@@ -143,5 +224,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
 

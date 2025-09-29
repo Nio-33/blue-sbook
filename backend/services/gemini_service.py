@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class GeminiService:
     def __init__(self):
         self.api_key = os.getenv('GEMINI_API_KEY')
-        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
         
         # Enhanced logging for debugging
         if not self.api_key:
@@ -224,16 +224,12 @@ class GeminiService:
             # Make API request
             headers = {
                 'Content-Type': 'application/json',
-            }
-            
-            params = {
-                'key': self.api_key
+                'x-goog-api-key': self.api_key
             }
             
             response = requests.post(
                 self.base_url,
                 headers=headers,
-                params=params,
                 json=payload,
                 timeout=30
             )
@@ -254,7 +250,7 @@ class GeminiService:
                             'success': True,
                             'message': ai_response.strip(),
                             'metadata': {
-                                'model': 'gemini-1.5-flash',
+                                'model': 'gemini-2.0-flash-exp',
                                 'prompt_tokens': len(prompt.split()),
                                 'response_tokens': len(ai_response.split()),
                                 'validation': validation,
