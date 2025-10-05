@@ -78,7 +78,11 @@ def create_app():
         print(f"🔍 Environment file exists: {(project_root / '.env').exists()}")
     
     # Enable CORS for frontend
-    CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:5000', 'http://localhost:5000'])
+    CORS(app, origins=[
+        'http://localhost:5001',
+        'http://127.0.0.1:5001',
+        'http://192.168.0.113:5001'
+    ])
     
     # Register blueprints with error handling
     blueprints_registered = []

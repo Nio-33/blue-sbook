@@ -5,7 +5,7 @@
 
 class BluesBookApp {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:5001/api/v1';
+        this.apiBaseUrl = `${window.location.origin}/api/v1`;
         this.players = [];
         this.currentPlayer = null;
         this.featuredPlayer = null;
